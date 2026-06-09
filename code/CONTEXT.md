@@ -1,0 +1,237 @@
+# MRNet Project Context & Terminology
+
+This document defines the domain language and key terminology for the MRNet knee MRI classification project. All team members should use this shared vocabulary to ensure clear communication.
+
+---
+
+## Domain Concepts
+
+### Medical Imaging Terms
+
+**Exam**  
+A complete MRI scan of a single patient's knee. Each exam consists of three imaging planes (axial, coronal, sagittal), where each plane contains multiple 2D slices.
+
+**Slice**  
+A single 2D MRI image from one plane of an exam. Slices are stacked to form a 3D volume. The number of slices varies per exam and per plane (typically 20-40 slices).
+
+**Plane**  
+One of three orthogonal views of the knee anatomy:
+- **Axial:** Top-down view (horizontal cross-sections)
+- **Coronal:** Front-back view (frontal cross-sections)
+- **Sagittal:** Side view (lateral cross-sections)
+
+Each plane provides different perspectives on anatomical structures. For example, ACL tears are often most visible in the sagittal plane.
+
+**Condition**  
+The clinical classification task. Three conditions in this project:
+- **ACL:** Anterior Cruciate Ligament tear detection
+- **Meniscus:** Meniscal tear detection (medial or lateral meniscus)
+- **Abnormal:** General abnormality detection (any pathology present)
+
+---
+
+## Model Architecture Terms
+
+**Backbone**  
+The feature extraction component of the model, typically a pre-trained CNN (e.g., ResNet18, ResNet50). The backbone processes 2D slices and outputs high-dimensional feature vectors. Also called "feature extractor."
+
+**Feature Extractor**  
+Synonym for backbone. The convolutional layers of a pre-trained model that extract visual features from images, before the final classification layer.
+
+**Max Pooling Aggregation**  
+The method used to combine features from multiple slices into a single representation. For an exam with S slices, the model extracts features `(S, 512)` and applies max pooling across the slice dimension to get `(512,)`. This answers: "What is the strongest evidence of a tear present in ANY slice?"
+
+**Logit**  
+The raw output of the model before applying sigmoid activation. For binary classification, the model outputs a single logit value. Applying sigmoid converts it to a probability in [0, 1].
+
+**Head / Classification Head**  
+The final layers of the model that convert features to predictions. In this project, typically a fully connected (FC) layer that maps from feature dimension (512) to a single binary output (1 logit).
+
+---
+
+## Training & Transfer Learning Terms
+
+**Freeze / Frozen Backbone**  
+Setting `requires_grad = False` for all parameters in the backbone, preventing them from being updated during training. Used in Phase 1 of two-phase training to preserve pre-trained weights while training only the custom classification head.
+
+**Unfreeze / Fine-tune**  
+Setting `requires_grad = True` to allow backbone parameters to be updated. Used in Phase 2 of two-phase training to adapt pre-trained features to the medical imaging domain.
+
+**Two-Phase Training**  
+A transfer learning strategy:
+1. **Phase 1:** Freeze backbone, train only custom layers (faster, prevents destroying pre-trained features)
+2. **Phase 2:** Unfreeze backbone, fine-tune entire model with lower learning rate (adapts features to task)
+
+**pos_weight**  
+A parameter of `BCEWithLogitsLoss` that upweights the positive class to handle class imbalance. Computed as `num_negative / num_positive`. For example, if ACL tears are 20% of the dataset (200 positive, 800 negative), `pos_weight = 800/200 = 4.0`.
+
+**Checkpoint**  
+A saved model state including weights, optimizer state, and training metadata. Typically save:
+- **Best checkpoint:** Model with best validation performance (for evaluation)
+- **Final checkpoint:** Model at end of training (for analysis)
+
+**Pilot Run**  
+Training a single model first to estimate training time, memory requirements, and validate the training pipeline before submitting all jobs. Essential for batch job systems like SLURM.
+
+---
+
+## Data & Preprocessing Terms
+
+**Augmentation**  
+Random transformations applied to training images to increase dataset diversity and reduce overfitting. In this project:
+- **Included:** Contrast/brightness jittering (simulates different MRI scanners)
+- **Excluded:** Horizontal flips (would incorrectly mirror medial/lateral anatomy)
+
+**On-the-fly Augmentation**  
+Augmentations applied during training when each batch is loaded, not pre-computed and saved to disk. Each epoch sees different random augmentations of the same images.
+
+**Channel Stacking / 1→3 Channel Conversion**  
+Repeating a single-channel grayscale image 3 times to create a 3-channel RGB-like tensor. Required to use ImageNet pre-trained models, which expect 3-channel inputs. Example: `(H, W)` → `(3, H, W)` by repeating along the channel dimension.
+
+**Train/Val/Test Split**  
+- **Train (80% of `train/` folder):** Used for model training (backpropagation, weight updates)
+- **Validation (20% of `train/` folder):** Used for early stopping, hyperparameter tuning, and model selection
+- **Test (provided `valid/` folder):** Held-out set for final evaluation only, never used during training or tuning
+
+---
+
+## Evaluation & Metrics Terms
+
+**Prediction Fusion / Multi-Plane Fusion**  
+Combining predictions from models trained on different planes (axial, coronal, sagittal) into a single prediction. In this project, using simple averaging: `final_prob = (prob_axial + prob_coronal + prob_sagittal) / 3`.
+
+**Per-Plane Evaluation**  
+Reporting metrics for individual plane models separately (e.g., ACL-axial: AUC 0.82, ACL-coronal: AUC 0.84, ACL-sagittal: AUC 0.86). Helps identify which planes are most informative for each condition.
+
+**Fused Evaluation**  
+Reporting metrics after combining predictions from all 3 planes (e.g., ACL-fused: AUC 0.87). This is the final model performance metric.
+
+**AUC (Area Under ROC Curve)**  
+Primary evaluation metric. Measures the model's ability to rank positive cases higher than negative cases, independent of threshold choice. Perfect classifier: AUC = 1.0, random classifier: AUC = 0.5.
+
+**Sensitivity / Recall / True Positive Rate**  
+Proportion of actual positives correctly identified by the model. Critical in medical imaging where missing a tear (false negative) has high cost. Formula: `TP / (TP + FN)`.
+
+**Specificity / True Negative Rate**  
+Proportion of actual negatives correctly identified by the model. Formula: `TN / (TN + FP)`.
+
+**Confidence Interval (95% CI)**  
+A range estimating the uncertainty of a metric. Example: AUC = 0.85 [0.82-0.88] means we're 95% confident the true AUC lies between 0.82 and 0.88. Computed using bootstrap resampling.
+
+**ROC Curve (Receiver Operating Characteristic)**  
+A plot of True Positive Rate (Sensitivity) vs. False Positive Rate (1 - Specificity) across all possible classification thresholds. The area under this curve is the AUC metric.
+
+**PR Curve (Precision-Recall Curve)**  
+A plot of Precision vs. Recall across all thresholds. Particularly informative for imbalanced datasets like ACL tears, where PR curves better reflect performance on the minority class.
+
+**Threshold**  
+The probability cutoff for converting model outputs to binary predictions. Default is 0.5: predict positive if probability ≥ 0.5, negative otherwise. Choice of threshold affects Sensitivity, Specificity, and F1-Score, but not AUC.
+
+---
+
+## Explainability Terms
+
+**Grad-CAM (Gradient-weighted Class Activation Mapping)**  
+A visualization technique that highlights which regions of an input image most influenced the model's prediction. Generates a heatmap overlay showing areas of high importance (typically in red/warm colors).
+
+**Saliency Map / Attention Map**  
+Synonym for Grad-CAM heatmap. Shows where the model "looks" when making a decision.
+
+**Max-Pooled Slice**  
+The specific slice (or slices) that contributed most to the final prediction after max pooling. Since max pooling selects maximum feature activations across slices, we can track which slice(s) provided those maximums. These are the most "important" slices for Grad-CAM visualization.
+
+**Clinical Interpretability**  
+The degree to which model predictions and explanations are understandable and trustworthy to medical professionals. Validated by checking if Grad-CAM heatmaps focus on anatomically relevant regions (e.g., ACL region for ACL tear predictions, not background artifacts).
+
+**Anatomical Validation**  
+Confirming that model attention (via Grad-CAM) aligns with known anatomical structures and expected pathology locations based on medical literature and domain knowledge.
+
+---
+
+## Technical & Workflow Terms
+
+**Factory Function**  
+A function that creates and returns model instances with consistent configuration. Example: `create_baseline_model(condition, plane)` returns a configured ResNet18 model. Enables architecture-agnostic code in the training pipeline.
+
+**SLURM (Simple Linux Utility for Resource Management)**  
+The batch job scheduling system used on the Sonic HPC cluster. Jobs are submitted via `sbatch` command with resource specifications (GPUs, CPUs, walltime).
+
+**Batch Job**  
+A computational task submitted to a cluster scheduler (SLURM) that runs asynchronously. For this project, each batch job trains one model (one condition-plane-architecture combination).
+
+**Walltime**  
+The maximum time a batch job is allowed to run before being terminated. Must be estimated and specified when submitting SLURM jobs.
+
+**Experiment Tracking**  
+Systematic recording of hyperparameters, metrics, and artifacts for each training run. In this project, using file-based checkpoints + TensorBoard for visualization.
+
+**TensorBoard**  
+A visualization tool for monitoring training progress in real-time. Logs training/validation loss, metrics, and other scalars over epochs.
+
+---
+
+## Architecture-Specific Terms
+
+**Baseline Model / Baseline Architecture**  
+The reference model used as a performance benchmark. In this project: ResNet18 pre-trained on ImageNet, with max pooling aggregation. All improvements are measured against this baseline.
+
+**Comparative Model / Comparative Architecture**  
+Alternative architectures compared against the baseline. In this project: ResNet50 (deeper), RadImageNet-pretrained models (medical imaging pre-training).
+
+**RadImageNet**  
+A large-scale dataset of medical images used for pre-training models on medical imaging tasks. Models pre-trained on RadImageNet may transfer better to MRI classification than ImageNet pre-trained models.
+
+**ImageNet**  
+A large-scale natural image dataset (1.2M images, 1000 classes) commonly used for pre-training computer vision models. Standard source of pre-trained weights, though not domain-specific for medical imaging.
+
+---
+
+## Project Structure Terms
+
+**Role**  
+A team member's primary area of responsibility. Six roles in this project: (1) Data Preprocessing, (2) Baseline Models, (3) Comparative Models, (4) Training Pipeline, (5) Evaluation, (6) Explainability.
+
+**Interface**  
+The contract between roles - the inputs a role expects and outputs it provides. Example: Role 1 (Data) provides a dataset with a `pos_weight` attribute that Role 4 (Training) consumes.
+
+**Module**  
+A Python file containing related functionality. Examples: `data_preprocessing_transformation.py`, `baseline_models.py`, `train.py`.
+
+**Base Class**  
+A parent class that encapsulates shared functionality. In this project, `MRNetBaseModel` contains common logic (max pooling, FC head, freeze/unfreeze utilities) used by both baseline and comparative models.
+
+---
+
+## Common Acronyms
+
+- **ACL:** Anterior Cruciate Ligament
+- **MRI:** Magnetic Resonance Imaging
+- **CNN:** Convolutional Neural Network
+- **FC:** Fully Connected (layer)
+- **BCE:** Binary Cross-Entropy (loss function)
+- **AUC:** Area Under Curve
+- **ROC:** Receiver Operating Characteristic
+- **PR:** Precision-Recall
+- **TP/TN/FP/FN:** True Positive / True Negative / False Positive / False Negative
+- **HPC:** High-Performance Computing
+- **GPU:** Graphics Processing Unit
+
+---
+
+## Usage Notes
+
+**When to use this document:**
+- During cross-role communication and meetings
+- When writing code comments and documentation
+- When preparing reports and presentations
+- When onboarding new team members
+
+**Maintaining this document:**
+- Update terminology as new concepts emerge during development
+- Add clarifications if team members use terms inconsistently
+- Keep definitions concise and accessible
+
+**Not included in this document:**
+- Implementation details (see code comments and module docstrings)
+- Design decisions and trade-offs (see ADRs when created)
+- Experimental results (see evaluation reports)

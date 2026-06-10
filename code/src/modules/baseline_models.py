@@ -29,11 +29,11 @@ class MRNetBaseModel(nn.Module):
         
         self.backbone = backbone  # Feature extractor (ResNet without final FC)
         
-        # TODO: Define max pooling layer (across slice dimension)
-        self.global_pool = None
+        # Max pooling across the slice dimension (picks the "loudest" slice)
+        self.global_pool = nn.AdaptiveMaxPool1d(1)
         
-        # TODO: Define binary classification head (512 -> 1)
-        self.fc = None
+        # Binary classification head: 512 thoughts -> 1 final score
+        self.fc = nn.Linear(512, 1)
         
     def forward(self, x):
         """
@@ -46,34 +46,66 @@ class MRNetBaseModel(nn.Module):
         Returns:
             torch.Tensor: Logit of shape (batch_size, 1)
         
-        TODO:
-        - Reshape to process all slices: (B, S, 3, H, W) -> (B*S, 3, H, W)
-        - Pass through backbone: (B*S, 3, H, W) -> (B*S, 512)
-        - Reshape back: (B*S, 512) -> (B, S, 512)
-        - Max pool across slices: (B, S, 512) -> (B, 512)
-        - Binary classifier: (B, 512) -> (B, 1)
+        Steps:
+        1. Reshape so all slices are processed individually by ResNet18
+        2. Run every slice through the ResNet18 backbone
+        3. Reshape back to group slices by exam
+        4. Max pool to find the "loudest" signal across all slices
+        5. Pass through our new mouth (fc) to get the final score
         """
-        pass
+        B, S, C, H, W = x.shape  # B=batch(1), S=slices, C=3channels, H=height, W=width
+        
+        # Step 1: Flatten batch+slice dims so ResNet sees each slice as a separate image
+        x = x.view(B * S, C, H, W)          # (B*S, 3, H, W)
+        
+        # Step 2: Pass all slices through the ResNet18 backbone
+        x = self.backbone(x)                 # (B*S, 512, 1, 1)  <- ResNet adds spatial dims
+        x = x.squeeze(-1).squeeze(-1)        # (B*S, 512)  <- remove the extra 1x1 spatial dims
+        
+        # Step 3: Reshape back to group slices per exam
+        x = x.view(B, S, 512)               # (B, S, 512)
+        
+        # Step 4: Max pool across the slice dimension - "loudest voice wins"
+        # permute to (B, 512, S) because AdaptiveMaxPool1d pools over last dim
+        x = x.permute(0, 2, 1)              # (B, 512, S)
+        x = self.global_pool(x)             # (B, 512, 1)
+        x = x.squeeze(-1)                   # (B, 512)
+        
+        # Step 5: Binary classification - output a single score per exam
+        x = self.fc(x)                      # (B, 1)
+        return x
     
     def freeze_backbone(self):
         """
         Freeze all backbone parameters (for Phase 1 training).
         
-        TODO: Set requires_grad=False for all backbone parameters
+        This prevents ResNet18's pre-learned knowledge from being corrupted
+        while our new classification head is still learning from scratch.
         """
-        pass
+        for param in self.backbone.parameters():
+            param.requires_grad = False
     
     def unfreeze_backbone(self, num_layers=None):
         """
         Unfreeze backbone parameters (for Phase 2 fine-tuning).
         
-        Args:
-            num_layers (int, optional): If specified, only unfreeze last N blocks.
-                                       If None, unfreeze all.
+        Once the classification head is trained, we unfreeze the backbone
+        and let the whole brain fine-tune together on knee MRIs.
         
-        TODO: Set requires_grad=True for backbone parameters
+        Args:
+            num_layers (int, optional): If specified, only unfreeze last N child blocks.
+                                       If None, unfreeze all.
         """
-        pass
+        if num_layers is None:
+            # Unfreeze the entire backbone
+            for param in self.backbone.parameters():
+                param.requires_grad = True
+        else:
+            # Only unfreeze the last num_layers children of the backbone
+            children = list(self.backbone.children())
+            for child in children[-num_layers:]:
+                for param in child.parameters():
+                    param.requires_grad = True
     
     def get_trainable_params(self):
         """
@@ -91,30 +123,42 @@ def create_baseline_model():
     
     Returns:
         MRNetBaseModel: Baseline model with ImageNet pretrained ResNet18
-        
-    TODO:
-    - Load pretrained ResNet18 from torchvision
-    - Remove final FC layer (keep only feature extractor)
-    - Create MRNetBaseModel with this backbone
-    - Return model
     """
-    # TODO: Load ResNet18
-    # backbone = models.resnet18(pretrained=True)
-    # backbone = nn.Sequential(*list(backbone.children())[:-1])  # Remove final FC
-    # model = MRNetBaseModel(backbone)
-    # return model
-    pass
+    # Load ResNet18 with ImageNet weights (it already knows how to see edges/shapes)
+    backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    
+    # Surgical step: remove the final classification layer (the "1000-word mouth")
+    # children()[:-1] means "take every layer EXCEPT the last one"
+    # AdaptiveAvgPool2d is the last spatial pooling; we keep it for feature compression
+    backbone = nn.Sequential(*list(backbone.children())[:-1])
+    
+    # Build our MRNet model with this pre-trained backbone
+    model = MRNetBaseModel(backbone)
+    return model
 
 
 if __name__ == '__main__':
-    # TODO: Test model creation and forward pass
-    # model = create_baseline_model()
-    # print(f"Model created successfully")
-    # 
-    # # Test freeze/unfreeze
-    # model.freeze_backbone()
-    # print(f"Trainable params (frozen): {len(model.get_trainable_params())}")
-    # 
-    # model.unfreeze_backbone()
-    # print(f"Trainable params (unfrozen): {len(model.get_trainable_params())}")
-    pass
+    print("Testing Baseline Model (Role 2)...")
+    
+    # Step A: Build the model
+    model = create_baseline_model()
+    print(f"✅ Model created successfully.")
+    
+    # Step B: Freeze the backbone (Phase 1 training mode)
+    model.freeze_backbone()
+    frozen_count = len(model.get_trainable_params())
+    print(f"✅ Backbone frozen. Trainable parameters: {frozen_count} (only the new mouth/fc layer)")
+    
+    # Step C: Unfreeze the backbone (Phase 2 fine-tuning mode)
+    model.unfreeze_backbone()
+    unfrozen_count = len(model.get_trainable_params())
+    print(f"✅ Backbone unfrozen. Trainable parameters: {unfrozen_count} (whole brain)")
+    
+    # Step D: Do a dummy forward pass to prove the shapes are all correct
+    # Simulate 1 exam with 22 slices, 3 channels (RGB-like), 256x256 pixels
+    dummy_input = torch.zeros(1, 22, 3, 256, 256)  # (B=1, S=22, C=3, H=256, W=256)
+    model.eval()  # Set to evaluation mode (disables dropout etc.)
+    with torch.no_grad():
+        output = model(dummy_input)
+    print(f"✅ Forward pass success! Input shape: {dummy_input.shape} -> Output shape: {output.shape}")
+    print(f"   (Output should be shape [1, 1] — one score per exam)")

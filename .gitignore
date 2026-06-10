@@ -4,16 +4,6 @@
 # Dataset (too large for git)
 code/src/data/
 
-# Model checkpoints (too large for git)
-checkpoints/
-
-# TensorBoard logs
-runs/
-
-# Results and visualizations
-results/
-visualizations/
-
 # Python cache
 __pycache__/
 *.py[cod]
@@ -26,3 +16,7 @@ __pycache__/
 
 # macOS metadata
 .DS_Store
+
+# Personal learning folder — private to this machine, never pushed to remote
+# Contains: checkpoints, results, visualisations, tutorials, Colab notebooks
+local_learning_hub/

@@ -27,7 +27,7 @@ except ImportError:
 
 
 # ─────────────────────────────────────────────
-# 1.  Load the saved model brains from disk
+# 1.  Load the saved model weights from disk
 # ─────────────────────────────────────────────
 def load_models(condition, architecture, checkpoint_dir):
     """
@@ -57,7 +57,7 @@ def load_models(condition, architecture, checkpoint_dir):
         else:
             model = create_comparative_model(architecture)
 
-        # Load the saved brain weights back in
+        # Load the saved weights
         checkpoint = torch.load(ckpt_path, map_location=device)
         model.load_state_dict(checkpoint['model_state_dict'])
         model.to(device)
@@ -101,7 +101,7 @@ def compute_metrics_with_ci(labels, predictions, threshold=0.5, n_bootstraps=100
     How bootstrap CI works (like a clinical trial):
       - Randomly resample the 120 patients 1,000 times (with replacement)
       - Calculate AUC for each resample
-      - The middle 95% of those 1,000 AUC values = your 95% CI
+      - The middle 95% of those 1,000 AUC values represents the 95% CI
     """
     binary_preds = (predictions >= threshold).astype(int)
 
@@ -150,7 +150,7 @@ def compute_metrics_with_ci(labels, predictions, threshold=0.5, n_bootstraps=100
 def plot_curves(labels, predictions, title, save_dir):
     """
     Plot ROC and PR curves side by side.
-    The ROC curve is the graph your professor will almost certainly want to see.
+    The ROC curve plots the true positive rate against the false positive rate.
     """
     os.makedirs(save_dir, exist_ok=True)
     fig, axes = plt.subplots(1, 2, figsize=(13, 5))

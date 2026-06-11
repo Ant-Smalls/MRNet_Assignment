@@ -121,9 +121,9 @@ def train_epoch(model, dataloader, optimizer, criterion, device):
     """
     Train one epoch, return average loss.
     The model looks at each MRI, makes a guess, measures how wrong it is,
-    and adjusts its brain connections to do better next time.
+    and updates model weights via backpropagation.
     """
-    model.train()  # Tell the model "you are in learning mode" (enables dropout etc.)
+    model.train()  # Set model to training mode (enables dropout, batchnorm updates)
     total_loss = 0.0
 
     # tqdm wraps the dataloader to show a live progress bar in the console
@@ -139,7 +139,7 @@ def train_epoch(model, dataloader, optimizer, criterion, device):
         output = model(exam)            # Forward pass: get the model's guess
         loss = criterion(output, label) # Calculate punishment (BCEWithLogitsLoss)
         loss.backward()                 # Backprop: figure out who was responsible
-        optimizer.step()                # Nudge the brain weights in the right direction
+        optimizer.step()                # Update model weights based on gradients
 
         total_loss += loss.item()
         # Update the progress bar to show the current running loss
@@ -153,7 +153,7 @@ def validate(model, dataloader, criterion, device):
     Run on validation exams (never seen during training).
     Returns: (avg_loss, auc_score)
     """
-    model.eval()   # Tell the model "you are in test mode" (no learning allowed)
+    model.eval()   # Set model to evaluation mode (disables dropout, fixes batchnorm)
     total_loss = 0.0
     all_labels, all_probs = [], []
 
@@ -184,8 +184,8 @@ def validate(model, dataloader, criterion, device):
 
 def save_checkpoint(model, optimizer, epoch, loss, checkpoint_path):
     """
-    Save a snapshot of the model's brain at this moment.
-    If we save when the model is at its best, we can restore it later.
+    Save model weights and optimizer state to disk.
+    Maintains best epoch based on validation loss.
     """
     torch.save({
         'epoch': epoch,
@@ -207,7 +207,7 @@ def main():
     if torch.cuda.is_available():
         device = torch.device('cuda')
     elif torch.backends.mps.is_available():
-        device = torch.device('mps')   # Your M2 Pro's built-in GPU!
+        device = torch.device('mps')   # Apple Silicon MPS
     else:
         device = torch.device('cpu')
     print(f"Training {model_name} on {device}")
@@ -224,8 +224,8 @@ def main():
     best_loss1 = train_phase(model, train_loader, val_loader, optimizer1, criterion,
                              args.epochs_phase1, 'phase1', checkpoint_dir, writer)
 
-    # Phase 2: Fine-tune the whole brain together
-    print("\nPhase 2: Fine-tuning — the whole brain learns together")
+    # Phase 2: Fine-tune all model parameters
+    print("\nPhase 2: Fine-tuning — all layers unfreezed")
     model.unfreeze_backbone()
     optimizer2 = optim.Adam(model.get_trainable_params(), lr=args.lr_phase2)
     best_loss2 = train_phase(model, train_loader, val_loader, optimizer2, criterion,

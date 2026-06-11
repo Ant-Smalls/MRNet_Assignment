@@ -19,3 +19,4 @@ __pycache__/
 
 # Personal learning folder — docs and notebooks pushed to private repo only.
 # Large outputs (checkpoints, results) are blocked by local_learning_hub/.gitignore
+local_learning_hub/

@@ -90,7 +90,7 @@ class MRNetBaseModel(nn.Module):
         Unfreeze backbone parameters (for Phase 2 fine-tuning).
         
         Once the classification head is trained, we unfreeze the backbone
-        and let the whole brain fine-tune together on knee MRIs.
+        and allow the entire model to be fine-tuned.
         
         Args:
             num_layers (int, optional): If specified, only unfreeze last N child blocks.
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     # Step C: Unfreeze the backbone (Phase 2 fine-tuning mode)
     model.unfreeze_backbone()
     unfrozen_count = len(model.get_trainable_params())
-    print(f"✅ Backbone unfrozen. Trainable parameters: {unfrozen_count} (whole brain)")
+    print(f"✅ Backbone unfrozen. Trainable parameters: {unfrozen_count} (all layers)")
     
     # Step D: Do a dummy forward pass to prove the shapes are all correct
     # Simulate 1 exam with 22 slices, 3 channels (RGB-like), 256x256 pixels

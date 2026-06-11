@@ -27,7 +27,7 @@ except ImportError:
 
 
 # ─────────────────────────────────────────────────────────────
-# 1. Load the saved brain from disk
+# 1. Load the saved model weights from disk
 # ─────────────────────────────────────────────────────────────
 def load_model(architecture, checkpoint_path, device):
     """
@@ -53,7 +53,7 @@ def get_gradcam_hook(model):
     """
     Register forward and backward hooks on the last conv block (layer4).
 
-    Think of this as clipping an electrode onto a specific nerve in the brain.
+    Register hook to capture gradients and activations from target layer.
     The forward hook records WHAT the layer saw.
     The backward hook records HOW MUCH each pixel mattered for the final answer.
 
@@ -194,8 +194,8 @@ def generate_visualization(exam_tensor, heatmap, slice_idx,
       Panel 2: Grad-CAM heatmap alone
       Panel 3: MRI + heatmap blended (the money shot)
 
-    This is the image you show the clinician / professor to prove
-    the model is looking at the right anatomy.
+    Generates the Grad-CAM visualization for clinical review, overlaying
+    heatmap activations to verify anatomical focus.
     """
     # Get raw pixel values of the key slice (0-255 uint8)
     # exam_tensor shape: (S, 1, H, W) — we need (H, W) for the key slice

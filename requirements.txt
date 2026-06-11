@@ -17,6 +17,7 @@ Pillow>=10.0.0
 
 # Experiment tracking
 tensorboard>=2.13.0
+tqdm>=4.65.0
 
 # Optional: For RadImageNet
 # wget  # for downloading pretrained weights

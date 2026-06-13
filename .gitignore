@@ -2,7 +2,8 @@
 .venv/
 
 # Dataset (too large for git)
-code/src/data/
+code/src/data/mrnet/
+code/src/data/mrnet_cropped/
 
 # Model checkpoints (too large for git)
 checkpoints/
@@ -26,3 +27,6 @@ __pycache__/
 
 # macOS metadata
 .DS_Store
+
+# Cursor 
+.cursor/

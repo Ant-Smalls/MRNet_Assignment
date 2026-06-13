@@ -54,37 +54,17 @@ The final layers of the model that convert features to predictions. In this proj
 
 ## Training & Transfer Learning Terms
 
-**Freeze / Frozen Backbone**  
-Setting `requires_grad = False` for all parameters in the backbone, preventing them from being updated during training. Used in Phase 1 of two-phase training to preserve pre-trained weights while training only the custom classification head.
-
-**Unfreeze / Fine-tune**  
-Setting `requires_grad = True` to allow backbone parameters to be updated. Used in Phase 2 of two-phase training to adapt pre-trained features to the medical imaging domain.
-
-**Two-Phase Training (Transfer Learning)**  
-A transfer learning strategy:
-1. **Phase 1:** Freeze backbone, train only custom layers (faster, prevents destroying pre-trained features)
-2. **Phase 2:** Unfreeze backbone, fine-tune entire model with lower learning rate (adapts features to task)
-
-**Multi-Phase Training (Slice Selection)**  
-A novel training workflow that uses model feedback to filter the dataset:
-1. **Phase A (All-Slices Training):** Train models on complete MRI volumes (all slices per exam)
-2. **Slice Extraction:** Use trained models to identify top-K most informative slices per exam
-3. **Phase B (Filtered Training):** Retrain same architectures on filtered datasets containing only selected slices
-4. **Comparison:** Evaluate performance of all-slices vs filtered-slices models
-
-**All-Slices Training / All-Slices Model**  
-Training mode where each exam uses its complete set of MRI slices (typically 20-40 slices). Baseline approach that includes all available data without filtering.
-
-**Filtered Training / Filtered Model**  
-Training mode where each exam uses only a subset of pre-selected "most informative" slices (e.g., top-5). Slices are selected based on their contribution to max pooling in a previously trained all-slices model.
+**End-to-End Fine-Tuning**  
+Training the entire model (backbone + classification head) simultaneously from the start with a small learning rate (~1e-4). Allows pretrained features to adapt to the medical imaging domain while preserving useful learned patterns. Single-phase approach used in this project.
 
 **pos_weight**  
 A parameter of `BCEWithLogitsLoss` that upweights the positive class to handle class imbalance. Computed as `num_negative / num_positive`. For example, if ACL tears are 20% of the dataset (200 positive, 800 negative), `pos_weight = 800/200 = 4.0`.
 
 **Checkpoint**  
-A saved model state including weights, optimizer state, and training metadata. Typically save:
-- **Best checkpoint:** Model with best validation performance (for evaluation)
-- **Final checkpoint:** Model at end of training (for analysis)
+A saved model state including weights and training metadata. In this project, we save only the **best checkpoint** (model with best validation AUC) for each training run, not intermediate or final checkpoints.
+
+**Pilot Run**  
+Training a single model first to estimate training time, memory requirements, and validate the training pipeline before submitting all jobs. Essential for batch job systems like SLURM.
 
 **Pilot Run**  
 Training a single model first to estimate training time, memory requirements, and validate the training pipeline before submitting all jobs. Essential for batch job systems like SLURM.
@@ -93,10 +73,21 @@ Training a single model first to estimate training time, memory requirements, an
 
 ## Data & Preprocessing Terms
 
+**R-CNN Semantic Cropping / Spatial Preprocessing**  
+A one-time preprocessing step using Faster R-CNN to automatically detect and crop knee joint space from MRI volumes. Trained on manual annotations, then applied to entire dataset. Saves cropped volumes to a separate directory (`data/mrnet_cropped/`). Novel contribution that reduces noise and focuses models on anatomically relevant regions.
+
+**Data Mode**  
+The preprocessing variant of the dataset used for training or evaluation. Two modes:
+- **Uncropped:** Original raw MRI data from `data/mrnet/`
+- **Cropped:** R-CNN preprocessed data from `data/mrnet_cropped/`
+
+**One-Time Preprocessing**  
+Running a preprocessing pipeline (like R-CNN cropping) once before training begins and saving results to disk, rather than applying transformations during data loading. More efficient for expensive operations that don't change between runs.
+
 **Augmentation**  
 Random transformations applied to training images to increase dataset diversity and reduce overfitting. In this project:
-- **Included:** Contrast/brightness jittering (simulates different MRI scanners)
-- **Excluded:** Horizontal flips (would incorrectly mirror medial/lateral anatomy)
+- **Included:** Contrast/brightness jittering (simulates different MRI scanners), small rotations (±10°)
+- **Excluded:** Horizontal/vertical flips (would incorrectly mirror anatomical sidedness), random crops (conflicts with R-CNN preprocessing)
 
 **On-the-fly Augmentation**  
 Augmentations applied during training when each batch is loaded, not pre-computed and saved to disk. Each epoch sees different random augmentations of the same images.
@@ -108,15 +99,6 @@ Repeating a single-channel grayscale image 3 times to create a 3-channel RGB-lik
 - **Train (80% of `train/` folder):** Used for model training (backpropagation, weight updates)
 - **Validation (20% of `train/` folder):** Used for early stopping, hyperparameter tuning, and model selection
 - **Test (provided `valid/` folder):** Held-out set for final evaluation only, never used during training or tuning
-
-**Filtered Dataset**  
-A dataset variant that loads only pre-selected slices for each exam, based on slice selection metadata. Constructed after all-slices training by identifying the top-K most informative slices per exam. Enables retraining on reduced, focused data.
-
-**Slice Selection Metadata**  
-JSON files mapping exam IDs to selected slice indices. Format: `{exam_id: [slice_indices]}`. Stored per condition-plane-architecture combination. Example: `{"0001": [5, 12, 18, 23, 27]}` indicates exam 0001 should use slices at indices 5, 12, 18, 23, and 27.
-
-**Top-K Slices / Informative Slices**  
-The K slices (typically K=5) that contributed most frequently to max pooling activations during inference. These are the slices the model relied on most heavily for its prediction. Selected dynamically per exam based on slice tracking.
 
 ---
 
@@ -131,8 +113,11 @@ Reporting metrics for individual plane models separately (e.g., ACL-axial: AUC 0
 **Fused Evaluation**  
 Reporting metrics after combining predictions from all 3 planes (e.g., ACL-fused: AUC 0.87). This is the final model performance metric.
 
-**Slice Mode Comparison**  
-Evaluating and comparing models trained with different slice selection strategies: all-slices (complete volumes) vs filtered-slices (top-K only). Reported alongside architecture comparisons (baseline vs comparative). Helps answer: "Does model-guided slice selection improve performance?"
+**2×2 Comparison Matrix**  
+Experimental design structure that compares 4 training modes:
+- Architecture dimension: ResNet18-ImageNet vs ResNet50-RadImageNet
+- Data dimension: Uncropped vs Cropped
+Enables analysis of main effects (architecture, preprocessing) and interaction effects (does cropping help one architecture more than the other?).
 
 **AUC (Area Under ROC Curve)**  
 Primary evaluation metric. Measures the model's ability to rank positive cases higher than negative cases, independent of threshold choice. Perfect classifier: AUC = 1.0, random classifier: AUC = 0.5.
@@ -165,8 +150,8 @@ A visualization technique that highlights which regions of an input image most i
 **Saliency Map / Attention Map**  
 Synonym for Grad-CAM heatmap. Shows where the model "looks" when making a decision.
 
-**Max-Pooled Slice**  
-The specific slice (or slices) that contributed most to the final prediction after max pooling. Since max pooling selects maximum feature activations across slices, we can track which slice(s) provided those maximums. These are the most "important" slices for Grad-CAM visualization.
+**Max-Pooled Slice / Most Informative Slice**  
+The specific slice that contributed most to the final prediction after max pooling. Since max pooling selects maximum feature activations across slices, we can track which slice provided those maximums. This is the most "important" slice for Grad-CAM visualization and explainability. Identified at inference time, not used for training data filtering.
 
 **Clinical Interpretability**  
 The degree to which model predictions and explanations are understandable and trustworthy to medical professionals. Validated by checking if Grad-CAM heatmaps focus on anatomically relevant regions (e.g., ACL region for ACL tear predictions, not background artifacts).
@@ -239,11 +224,9 @@ A parent class that encapsulates shared functionality. In this project, `MRNetBa
 
 **Training Phase / Workflow Phase**  
 Distinct stages in the model development pipeline:
-- **Phase A:** All-slices training (baseline data)
-- **Slice Extraction:** Model-guided identification of informative slices
-- **Phase B:** Filtered training (reduced data)
-- **Evaluation:** Performance comparison across all models
-- **Triage:** Clinical interface development
+- **Training:** All 36 models trained in parallel (4 modes × 3 conditions × 3 planes)
+- **Evaluation:** Performance comparison across 2×2 matrix
+- **Triage:** Clinical interface development using best performing model
 
 Each phase has dependencies on previous phases and specific deliverables.
 
@@ -270,23 +253,20 @@ Each phase has dependencies on previous phases and specific deliverables.
 
 These terms are specific to the novel contributions of this project and may not be found in standard MRNet literature:
 
-**Model-Guided Slice Selection**  
-A data curation approach where a trained model identifies which slices are most important for its predictions, and these slices are used to create a filtered dataset for retraining. Hypothesis: Training on only informative slices can improve performance by reducing noise and increasing focus on relevant anatomy.
+**R-CNN Preprocessing Pipeline / Semantic Joint Detection**  
+A Faster R-CNN model trained on manually annotated middle slices to automatically detect and crop knee joint space from MRI volumes. Applied as one-time preprocessing before classification training. Novel contribution that focuses models on anatomically relevant regions and reduces background noise.
 
-**Dynamic Slice Selection / Per-Exam Selection**  
-Selecting different slices for each exam based on that specific exam's features, rather than using fixed slice indices or positions across all exams. Each exam may have its tear at a different anatomical location, so the "most informative" slices vary per case.
-
-**Slice Selection Independence**  
-The principle that each condition-plane-architecture combination selects its own informative slices. ACL-sagittal identifies different slices than Meniscus-coronal because they look for different anatomical features. Similarly, ResNet18 and ResNet50 may attend to different patterns, so each selects independently.
+**Slice Tracking for Explainability**  
+Using max pooling metadata to identify which slices contributed most to a model's prediction, enabling targeted visualization and interpretation. Unlike filtered training approaches, slice tracking is used purely for understanding model behavior, not for data curation.
 
 **forward_with_slice_tracking()**  
 A model method that extends the standard forward pass to return both the prediction (logit) and metadata about which slices contributed to max pooling. Technical implementation: stores slice indices during the max pooling operation and returns them alongside the prediction.
 
-**Retraining on Filtered Data**  
-The second training phase where the same model architecture is trained from scratch using only the top-K slices identified in the first phase. Different from fine-tuning (which continues training the same model) - this is a fresh training run with a modified dataset.
-
-**Two-Mode Comparison**  
-Evaluating each architecture in both training modes (all-slices and filtered) to isolate the effect of slice selection. Example: ResNet18-all-slices vs ResNet18-filtered tells us if slice selection helps. ResNet18-filtered vs ResNet50-filtered tells us if better architecture helps. This creates a 2×2 comparison matrix.
+**2×2 Experimental Design**  
+Systematic comparison of 4 training modes arranged in a matrix:
+- Architecture: ResNet18-ImageNet vs ResNet50-RadImageNet
+- Data: Uncropped vs Cropped
+Enables measurement of main effects (architecture, preprocessing) and interaction effects (synergies between architectural and preprocessing choices).
 
 ---
 

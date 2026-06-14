@@ -2,122 +2,363 @@
 Role 4: Training Pipeline & Hyperparameter Tuning
 
 Two-phase training for SLURM batch jobs.
+  Phase 1: Backbone frozen — only the classification head trains (higher lr)
+  Phase 2: Full fine-tuning — entire network trains (lower lr)
+
 Usage: python train.py --condition acl --plane sagittal --architecture baseline
 """
 
+#imports
 import argparse
 import os
+import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
+from sklearn.metrics import roc_auc_score
+import numpy as np
 
 from modules.data_preprocessing_transformation import MRNetDataset, get_augmentation_transform
 from modules.baseline_models import create_baseline_model
 from modules.comparative_models import create_comparative_model
 
 
+#control training script without editing code
+#example usage: python train.py --condition acl --plane sagittal --architecture baseline
 def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--condition', type=str, required=True, choices=['acl', 'meniscus', 'abnormal'])
-    parser.add_argument('--plane', type=str, required=True, choices=['axial', 'coronal', 'sagittal'])
-    parser.add_argument('--architecture', type=str, default='baseline')
-    parser.add_argument('--epochs_phase1', type=int, default=10)
-    parser.add_argument('--epochs_phase2', type=int, default=20)
-    parser.add_argument('--lr_phase1', type=float, default=1e-3)
-    parser.add_argument('--lr_phase2', type=float, default=1e-4)
-    parser.add_argument('--batch_size', type=int, default=1)
-    parser.add_argument('--data_dir', type=str, default='src/data/mrnet/')
-    parser.add_argument('--checkpoint_dir', type=str, default='checkpoints/')
+    parser.add_argument('--condition',       type=str,   required=True, choices=['acl', 'meniscus', 'abnormal'])
+    parser.add_argument('--plane',           type=str,   required=True, choices=['axial', 'coronal', 'sagittal'])
+    parser.add_argument('--architecture',    type=str,   default='baseline', choices=['baseline', 'comparative'])
+    parser.add_argument('--data_mode',       type=str,   default='uncropped', choices=['uncropped', 'cropped'])
+    parser.add_argument('--epochs_phase1',   type=int,   default=10)
+    parser.add_argument('--epochs_phase2',   type=int,   default=20)
+    parser.add_argument('--lr_phase1',       type=float, default=1e-3)
+    parser.add_argument('--lr_phase2',       type=float, default=1e-4)
+    parser.add_argument('--weight_decay',    type=float, default=1e-4)
+    parser.add_argument('--patience',        type=int,   default=5,
+                        help='Early stopping patience (epochs without AUC improvement)')
+    parser.add_argument('--optimizer', type=str, default='adamw', choices=['adamw', 'sgd'],
+                    help='Optimizer to use for training')
+    parser.add_argument('--batch_size',      type=int,   default=1)
+    parser.add_argument('--data_dir',        type=str,   default='src/data/mrnet/')
+    parser.add_argument('--checkpoint_dir',  type=str,   default='checkpoints/')
+    parser.add_argument('--val_split',       type=float, default=0.2)
+    parser.add_argument('--seed',            type=int,   default=42)
     return parser.parse_args()
 
 
+# ---------------------------------------------------------------------------
+# Data
+# ---------------------------------------------------------------------------
+
 def create_data_loaders(args):
     """
-    Create train and validation dataloaders.
-    Returns: (train_loader, val_loader, pos_weight)
-    
-    TODO: Create datasets (80/20 split), get pos_weight, create DataLoaders
-    """
-    pass
+    Create train and validation DataLoaders from the train/ split.
+    The held-out valid/ folder is reserved for Role 5 final evaluation.
 
+    Returns: (train_loader, val_loader, pos_weight)
+      - pos_weight is a scalar tensor for BCEWithLogitsLoss
+    """
+    torch.manual_seed(args.seed)
+
+    # Full training dataset (augmented)
+    full_dataset = MRNetDataset(
+        data_dir=args.data_dir,
+        condition=args.condition,
+        plane=args.plane,
+        split='train',
+        data_mode=args.data_mode, #cropped or uncropped
+        transform=get_augmentation_transform(),
+    )
+
+    # 80/20 split — reproducible via seed above
+    n_total = len(full_dataset)
+    n_val   = int(n_total * args.val_split)
+    n_train = n_total - n_val
+    train_dataset, val_dataset = random_split(full_dataset, [n_train, n_val])
+
+    # Validation should NOT have augmentation — swap transform on the subset
+    val_dataset_clean = MRNetDataset(
+        data_dir=args.data_dir,
+        condition=args.condition,
+        plane=args.plane,
+        split='train',
+        data_mode=args.data_mode,
+        transform=None,
+    )
+    # Re-use the same indices so the split is identical
+    val_dataset.dataset = val_dataset_clean
+
+    # batch_size=1 because MRI volumes have variable slice counts
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size, shuffle=False)
+
+    # pos_weight from the FULL training dataset label distribution
+    # BCEWithLogitsLoss uses this to penalise missing the minority class
+    pos_weight = full_dataset.pos_weight  # tensor scalar: num_neg / num_pos
+
+    print(f"Dataset sizes — train: {n_train}, val: {n_val}")
+    print(f"pos_weight: {pos_weight.item():.3f}  "
+          f"(higher = more imbalanced toward negatives)")
+
+    return train_loader, val_loader, pos_weight
+
+
+# ---------------------------------------------------------------------------
+# Model
+# ---------------------------------------------------------------------------
 
 def create_model(args):
-    """
-    Create model based on architecture.
-    TODO: Call create_baseline_model() or create_comparative_model(args.architecture)
-    """
-    pass
+    """Instantiate the correct architecture."""
+    if args.architecture == 'baseline':
+        print("Architecture: ResNet18 (ImageNet weights)")
+        return create_baseline_model()
+    else:
+        print("Architecture: ResNet50 (RadImageNet weights)")
+        return create_comparative_model()
 
 
-def train_phase(model, train_loader, val_loader, optimizer, criterion, 
-                num_epochs, phase_name, checkpoint_dir, writer):
-    """
-    Train for one phase, return best validation loss.
-    
-    TODO: Loop epochs, train, validate, log to TensorBoard, save best checkpoint
-    """
-    pass
+# ---------------------------------------------------------------------------
+# Optimizer
+# ---------------------------------------------------------------------------
 
+def create_optimizer(args, params, lr):
+    """
+    Create optimizer based on --optimizer flag.
+    AdamW: adaptive learning rate, good default for fine-tuning pretrained CNNs.
+    SGD with momentum: simpler update rule, can generalise better with enough tuning.
+    """
+    if args.optimizer == 'adamw':
+        return optim.AdamW(params, lr=lr, weight_decay=args.weight_decay)
+    else:
+        return optim.SGD(params, lr=lr, weight_decay=args.weight_decay, 
+                         momentum=0.9, nesterov=True)
+
+
+# ---------------------------------------------------------------------------
+# Core training helpers
+# ---------------------------------------------------------------------------
 
 def train_epoch(model, dataloader, optimizer, criterion, device):
     """
-    Train one epoch, return average loss.
-    TODO: Set train mode, loop batches, forward/backward pass
+    One full pass over the training set.
+    Returns average loss for the epoch.
     """
-    pass
+    #set model to train mode
+    model.train()
+    total_loss = 0.0
+
+    for exam, label in dataloader:
+        # exam:  (1, num_slices, 3, H, W)  — batch size is always 1
+        # label: (1,)
+        #move data to GPU
+        exam  = exam.to(device)
+        label = label.float().to(device)
+
+        #clear gradiants from previous scan
+        optimizer.zero_grad()
+        logits = model(exam).squeeze(1)   # (1,) → scalar-ish
+        loss   = criterion(logits, label)
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+
+    return total_loss / len(dataloader)
 
 
 def validate(model, dataloader, criterion, device):
     """
-    Validate model, return (avg_loss, auc_score).
-    TODO: Set eval mode, compute loss and AUC
+    Run the validation set.
+    Returns (avg_loss, auc_score).
+    AUC is the primary metric used for early stopping and checkpointing.
     """
-    pass
+    #evaluation mode
+    model.eval()
+    total_loss = 0.0
+    all_probs  = []
+    all_labels = []
+
+    #dont track gradiants
+    with torch.no_grad():
+        for exam, label in dataloader:
+            exam  = exam.to(device)
+            label = label.float().to(device)
+
+            logits = model(exam).squeeze(1)
+            loss   = criterion(logits, label)
+            total_loss += loss.item()
+
+            #convert logits -> probabilities for AUC
+            prob = torch.sigmoid(logits).cpu().numpy()
+            all_probs.extend(prob.tolist())
+            all_labels.extend(label.cpu().numpy().tolist())
+
+    avg_loss = total_loss / len(dataloader)
+
+    # AUC requires at least one positive and one negative sample
+    unique_labels = set(all_labels)
+    if len(unique_labels) < 2:
+        auc = 0.5   # undefined —> return chance level
+    else:
+        auc = roc_auc_score(all_labels, all_probs)
+
+    return avg_loss, auc
 
 
-def save_checkpoint(model, optimizer, epoch, loss, checkpoint_path):
-    """
-    Save checkpoint.
-    TODO: Save model/optimizer state_dict, epoch, loss
-    """
-    pass
+# ---------------------------------------------------------------------------
+# Checkpoint
+# ---------------------------------------------------------------------------
 
+def save_checkpoint(model, optimizer, epoch, loss, auc, checkpoint_path):
+    """Save model state, optimizer state, and training metadata."""
+    torch.save({
+        'epoch':                epoch,
+        'model_state_dict':     model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'val_loss':             loss,
+        'val_auc':              auc,
+    }, checkpoint_path)
+
+
+# ---------------------------------------------------------------------------
+# Phase trainer
+# ---------------------------------------------------------------------------
+
+def train_phase(model, train_loader, val_loader, optimizer, criterion,
+                num_epochs, phase_name, checkpoint_dir, writer, patience, device):
+    """
+    Train for one phase with early stopping on validation AUC.
+
+    Saves the best checkpoint (by AUC) to:
+        {checkpoint_dir}/best_{phase_name}.pth
+
+    Returns best validation AUC achieved during this phase.
+    """
+    best_auc        = 0.0
+    epochs_no_improve = 0
+    checkpoint_path = os.path.join(checkpoint_dir, f'best_{phase_name}.pth')
+
+    #scheduer
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode = 'max',
+        factor = 0.5,
+        patience = 3,
+        verbose = True
+    )
+    #for each epoch, train and validate 
+    for epoch in range(1, num_epochs + 1):
+        train_loss          = train_epoch(model, train_loader, optimizer, criterion, device)
+        val_loss, val_auc   = validate(model, val_loader, criterion, device)
+
+        #step scheduler
+        scheduler.step(val_auc)
+        #log current learning rate
+        current_lr = optimizer.param_groups[0]['lr']
+        writer.add_scalar(f'{phase_name}/learning_rate', current_lr, epoch)
+
+        # TensorBoard logging
+        writer.add_scalar(f'{phase_name}/train_loss', train_loss, epoch)
+        writer.add_scalar(f'{phase_name}/val_loss',   val_loss,   epoch)
+        writer.add_scalar(f'{phase_name}/val_auc',    val_auc,    epoch)
+
+        print(f"  [{phase_name}] Epoch {epoch}/{num_epochs} — "
+              f"train_loss: {train_loss:.4f}  "
+              f"val_loss: {val_loss:.4f}  "
+              f"val_auc: {val_auc:.4f}")
+
+        # Save best checkpoint
+        if val_auc > best_auc:
+            best_auc = val_auc
+            epochs_no_improve = 0
+            save_checkpoint(model, optimizer, epoch, val_loss, val_auc, checkpoint_path)
+            print(f"  --> New best AUC: {best_auc:.4f} — checkpoint saved")
+        else:
+            epochs_no_improve += 1
+            print(f"  --> No improvement ({epochs_no_improve}/{patience})")
+
+        # Early stopping
+        if epochs_no_improve >= patience:
+            print(f"  Early stopping triggered after {epoch} epochs.")
+            break
+
+    # Reload best weights before returning so Phase 2 starts from the best Phase 1 state
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    print(f"  Loaded best {phase_name} weights (AUC: {best_auc:.4f})")
+
+    return best_auc
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 def main():
-    """Main training function."""
-    args = parse_args()
-    model_name = f"{args.condition}_{args.plane}_{args.architecture}"
+    args       = parse_args()
+    #creates a unique model and folder name based on the training parameters
+    model_name = f"{args.condition}_{args.plane}_{args.architecture}_{args.data_mode}"
     checkpoint_dir = os.path.join(args.checkpoint_dir, model_name)
     os.makedirs(checkpoint_dir, exist_ok=True)
-    
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"Training {model_name} on {device}")
-    
-    # TODO: Create dataloaders and model
+    print(f"Training: {model_name}")
+    print(f"Device:   {device}\n")
+
+    # Save config for reproducibility — Role 5 can read this to know what was used
+    config = vars(args)
+    config['model_name'] = model_name
+    with open(os.path.join(checkpoint_dir, 'config.json'), 'w') as f:
+        json.dump(config, f, indent=2)
+
+    # Data, model, loss, logging
     train_loader, val_loader, pos_weight = create_data_loaders(args)
-    model = create_model(args).to(device)
+    model     = create_model(args).to(device)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight.to(device))
-    writer = SummaryWriter(log_dir=os.path.join('runs', model_name))
-    
-    # Phase 1: Frozen backbone
-    print("\nPhase 1: Frozen backbone")
+    writer    = SummaryWriter(log_dir=os.path.join('runs', model_name))
+
+    #phase 1: frozen backbone, train head only
+    print("Phase 1: Frozen backbone (head only)")
     model.freeze_backbone()
-    optimizer1 = optim.Adam(model.get_trainable_params(), lr=args.lr_phase1)
-    best_loss1 = train_phase(model, train_loader, val_loader, optimizer1, criterion,
-                             args.epochs_phase1, 'phase1', checkpoint_dir, writer)
-    
-    # Phase 2: Fine-tuning
-    print("\nPhase 2: Fine-tuning")
+    optimizer1 = create_optimizer(args, model.get_trainable_params(), args.lr_phase1)
+    best_auc1 = train_phase(
+        model, train_loader, val_loader,
+        optimizer1, criterion,
+        args.epochs_phase1, 'phase1',
+        checkpoint_dir, writer,
+        args.patience, device,
+    )
+
+    #phase 2, full fine tuning
+    print("\nPhase 2: Full fine-tuning (all layers)")
     model.unfreeze_backbone()
-    optimizer2 = optim.Adam(model.get_trainable_params(), lr=args.lr_phase2)
-    best_loss2 = train_phase(model, train_loader, val_loader, optimizer2, criterion,
-                             args.epochs_phase2, 'phase2', checkpoint_dir, writer)
-    
+    optimizer2 = create_optimizer(args, model.parameters(), args.lr_phase2)
+    best_auc2 = train_phase(
+        model, train_loader, val_loader,
+        optimizer2, criterion,
+        args.epochs_phase2, 'phase2',
+        checkpoint_dir, writer,
+        args.patience, device,
+    )
+
     writer.close()
-    print(f"\nComplete! Best loss - Phase1: {best_loss1:.4f}, Phase2: {best_loss2:.4f}")
+
+    # Save final summary so Role 5 can quickly read results without loading checkpoints
+    summary = {
+        'model_name':   model_name,
+        'best_auc_phase1': best_auc1,
+        'best_auc_phase2': best_auc2,
+    }
+    with open(os.path.join(checkpoint_dir, 'summary.json'), 'w') as f:
+        json.dump(summary, f, indent=2)
+
+    print(f"\nDone! Best AUC — Phase 1: {best_auc1:.4f}  Phase 2: {best_auc2:.4f}")
+    print(f"Checkpoints saved to: {checkpoint_dir}")
 
 
 if __name__ == '__main__':

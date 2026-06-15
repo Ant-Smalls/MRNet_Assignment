@@ -1,0 +1,32 @@
+==========================================
+Job ID: 424010
+Job Name: mrnet_eval
+Node: sonicgpu12
+Start Time: Mon 15 Jun 13:45:05 IST 2026
+==========================================
+
+Current working directory: /home/people/23225831/MRNet-assignment
+
+==========================================
+Starting Evaluation Job at Mon 15 Jun 13:45:05 IST 2026
+==========================================
+
+Evaluating: meniscus-sagittal-uncropped
+Device: cuda
+Loading checkpoint: checkpoints/meniscus_sagittal_baseline_uncropped_best.pth
+
+Evaluation Complete!
+Total validation samples: 120
+------------------------------
+AUC:         0.7592
+Accuracy:    0.6833
+F1 Score:    0.6724
+Precision:   0.6094
+Sensitivity: 0.7500  (Recall)
+Specificity: 0.6324
+------------------------------
+
+==========================================
+Evaluation completed at Mon 15 Jun 13:45:21 IST 2026
+Exit code: 0
+==========================================

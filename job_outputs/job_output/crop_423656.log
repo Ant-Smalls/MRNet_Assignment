@@ -1,0 +1,30 @@
+==========================================
+Job ID: 423656
+Job Name: crop_mrnet
+Node: sonicgpu2
+Start Time: Mon 15 Jun 09:40:01 IST 2026
+==========================================
+
+Current working directory: /home/people/23225831/MRNet-assignment
+
+Python version: Python 3.9.25
+PyTorch version: 2.8.0+cu128
+CUDA available: True
+CUDA version: 12.8
+Number of GPUs: 1
+GPU Name: Tesla V100-PCIE-32GB
+
+==========================================
+Starting Crop Job at Mon 15 Jun 09:40:12 IST 2026
+==========================================
+
+Using device: cuda
+Downloading: "https://download.pytorch.org/models/resnet50-0676ba61.pth" to /home/people/23225831/.cache/torch/hub/checkpoints/resnet50-0676ba61.pth
+Found 3750 volumes to crop.
+Finished! Successfully cropped 3747/3750 volumes.
+
+==========================================
+Job completed at Mon 15 Jun 09:47:49 IST 2026
+Exit code: 0
+==========================================
+

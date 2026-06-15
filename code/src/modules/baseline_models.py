@@ -55,12 +55,16 @@ class MRNetBaseModel(nn.Module):
         for param in self.backbone.parameters():
             param.requires_grad = True
 
+    def get_trainable_params(self):
+        """Returns parameters that require gradients (for optimizer)."""
+        return [p for p in self.parameters() if p.requires_grad]
+
 
 def create_baseline_model():
     """Create baseline ResNet18 model with ImageNet pretraining.
     Removes final FC layer (designed for 1000 ImageNet classes) and replaces with 
     custom FC(512->1) for binary classification."""
-    resnet18 = models.resnet18(pretrained=True)
+    resnet18 = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
     backbone = nn.Sequential(*list(resnet18.children())[:-1])
     model = MRNetBaseModel(backbone)
     return model

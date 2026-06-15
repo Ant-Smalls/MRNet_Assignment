@@ -1,0 +1,125 @@
+# Single condition / Plane
+
+#!/bin/bash -l
+#SBATCH --job-name=mrnet_eval
+# Request 1 node
+#SBATCH -N 1
+# GPU partition
+#SBATCH --partition=gpu
+# Request 1 GPU 
+#SBATCH --gres=gpu:1
+# Number of CPU cores
+#SBATCH --ntasks-per-node=4
+# Expected runtime: 30 minutes 
+#SBATCH -t 01:00:00
+# Email notifications
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=student_email@ucdconnect.ie
+# Output logs
+#SBATCH --output=eval_output/eval_%j.log
+#SBATCH --error=eval_output/eval_%j.err
+
+# Print job information
+echo "=========================================="
+echo "Job ID: $SLURM_JOB_ID"
+echo "Job Name: $SLURM_JOB_NAME"
+echo "Node: $SLURM_NODELIST"
+echo "Start Time: $(date)"
+echo "=========================================="
+echo ""
+
+# Navigate to project directory
+cd /home/people/{student_number}/MRNet-assignment
+
+echo "Current working directory: $(pwd)"
+echo ""
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Create output directory for logs
+mkdir -p eval_output
+
+echo "=========================================="
+echo "Starting Evaluation Job at $(date)"
+echo "=========================================="
+echo ""
+
+# Update the --checkpoint path to the actual best model saved during training & data from cropped / uncropped
+python3 code/src/minimal_eval.py \
+  --condition meniscus \
+  --plane sagittal \
+  --data_mode uncropped \
+  --checkpoint checkpoints/meniscus_sagittal_baseline_uncropped_best.pth
+
+JOB_EXIT_CODE=$?
+
+echo ""
+echo "=========================================="
+echo "Evaluation completed at $(date)"
+echo "Exit code: $JOB_EXIT_CODE"
+echo "=========================================="
+
+# Multi condition / Plane
+# E.g. for uncropped 
+
+#!/bin/bash -l
+#SBATCH --job-name=eval_uncropped
+#SBATCH -N 1
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
+#SBATCH --ntasks-per-node=4
+#SBATCH -t 02:00:00  # 2 hours for 9 evaluations
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=student@ucdconnect.ie
+#SBATCH --output=eval_output/eval_uncropped_%j.log
+#SBATCH --error=eval_output/eval_uncropped_%j.err
+
+echo "=========================================="
+echo "Job ID: $SLURM_JOB_ID"
+echo "Evaluating ALL UNCROPPED Models"
+echo "Start Time: $(date)"
+echo "=========================================="
+echo ""
+
+cd /home/people/{student_number}/MRNet-assignment
+source venv/bin/activate
+mkdir -p eval_output
+
+CONDITIONS=("acl" "meniscus" "abnormal")
+PLANES=("sagittal" "axial" "coronal")
+DATA_MODE="uncropped"
+
+for condition in "${CONDITIONS[@]}"; do
+  for plane in "${PLANES[@]}"; do
+    
+    CHECKPOINT="checkpoints/${condition}_${plane}_baseline_${DATA_MODE}_best.pth"
+    
+    echo ""
+    echo "=========================================="
+    echo "Evaluating: $condition - $plane - $DATA_MODE"
+    echo "Checkpoint: $CHECKPOINT"
+    echo "$(date)"
+    echo "=========================================="
+    
+    python3 code/src/minimal_eval.py \
+      --condition $condition \
+      --plane $plane \
+      --data_mode $DATA_MODE \
+      --checkpoint $CHECKPOINT
+    
+    EXIT_CODE=$?
+    if [ $EXIT_CODE -ne 0 ]; then
+      echo "ERROR: Evaluation failed for $condition-$plane-$DATA_MODE"
+    else
+      echo "SUCCESS: Completed $condition-$plane-$DATA_MODE"
+    fi
+    
+  done
+done
+
+echo ""
+echo "=========================================="
+echo "All UNCROPPED evaluation completed"
+echo "End Time: $(date)"
+echo "=========================================="

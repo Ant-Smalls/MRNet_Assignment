@@ -34,7 +34,7 @@ class MRNetDataset(Dataset):
         
         if split in ['train', 'val']:
             # Load patient IDs from our custom split
-            split_json = f"{root_dir}/patient_splits.json"
+            split_json = f"{root_dir}/patient_splits_training.json"
             with open(split_json) as f:
                 patient_ids = json.load(f)[split]
             
@@ -109,3 +109,55 @@ def get_augmentation_transform(is_training=True):
         return augment
     else:
         return lambda x: x
+
+
+class ValidMRNetDataset(Dataset):
+    """Minimal dataset class specifically for the true validation set."""
+    def __init__(self, root_dir, condition, plane, data_mode):
+        self.condition = condition.lower()
+        self.plane = plane.lower()
+        
+        # Point to the valid directory instead of train
+        if data_mode == 'uncropped':
+            self.data_dir = os.path.join(root_dir, f"mrnet/valid/{self.plane}/")
+        else:
+            self.data_dir = os.path.join(root_dir, f"mrnet_cropped/valid/{self.plane}/")
+            
+        label_csv = os.path.join(root_dir, f"mrnet/valid-{self.condition}.csv")
+        
+        # Read CSV and clean up the underscores (e.g., '_1130' -> 1130)
+        df = pd.read_csv(label_csv, header=None, names=['id', 'label'])
+        df['id'] = df['id'].astype(str).str.replace('_', '').astype(int)
+        df['label'] = df['label'].astype(str).str.replace('_', '').astype(int)
+        
+        self.file_paths = []
+        self.labels = []
+        
+        for patient_id, label in df.itertuples(index=False):
+            filename = f"{int(patient_id):04d}.npy"
+            path = os.path.join(self.data_dir, filename)
+            if os.path.exists(path):
+                self.file_paths.append(path)
+                self.labels.append(int(label))
+                
+    def __len__(self):
+        return len(self.file_paths)
+        
+    def __getitem__(self, idx):
+        volume = np.load(self.file_paths[idx])
+        
+        # Handle 4D volumes by extracting first channel
+        if volume.ndim == 4 and volume.shape[1] == 3:
+            volume = volume[:, 0, :, :]
+            
+        # Min-max normalization to [0, 1]
+        volume = volume.astype(np.float32)
+        volume = (volume - volume.min()) / (volume.max() - volume.min() + 1e-8)
+        
+        # Convert to tensor and stack to 3 channels for ResNet
+        exam_tensor = torch.from_numpy(volume).float()
+        exam_tensor = exam_tensor.unsqueeze(1).repeat(1, 3, 1, 1)
+        
+        label = torch.tensor(self.labels[idx], dtype=torch.float32)
+        return exam_tensor, label
+

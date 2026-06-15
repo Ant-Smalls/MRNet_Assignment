@@ -1,0 +1,32 @@
+# Python virtual environment
+.venv/
+
+# Dataset (too large for git)
+code/src/data/mrnet/
+code/src/data/mrnet_cropped/
+
+# Model checkpoints (too large for git)
+checkpoints/
+
+# TensorBoard logs
+runs/
+
+# Results and visualizations
+results/
+visualizations/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# macOS metadata
+.DS_Store
+
+# Cursor 
+.cursor/

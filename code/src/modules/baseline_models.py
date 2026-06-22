@@ -1,16 +1,18 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchvision.models as models
 
 
 class MRNetBaseModel(nn.Module):
-    """ResNet18 backbone with max pooling across slices for MRI volume classification.
-    Architecture: ResNet18 (no FC) -> Max pool slices -> FC(512->1)"""
+    """AlexNet backbone with max pooling across slices for MRI volume classification.
+    Architecture: AlexNet features -> Global Avg Pool -> Max pool slices -> FC(256->1)
+    Modeling after original MRNet architecture from the paper."""
     
     def __init__(self, backbone):
         super().__init__()
         self.backbone = backbone
-        self.fc = nn.Linear(512, 1)
+        self.fc = nn.Linear(256, 1)
     
     def forward(self, x):
         """Args: x (batch_size, num_slices, 3, H, W)
@@ -21,7 +23,10 @@ class MRNetBaseModel(nn.Module):
         x = x.view(batch_size * num_slices, 3, x.shape[3], x.shape[4])
         features = self.backbone(x)
         
-        # Flatten and reshape back to (batch_size, num_slices, 512)
+        # Global average pooling to reduce spatial dimensions
+        features = F.adaptive_avg_pool2d(features, (1, 1))  
+        
+        # Flatten and reshape back to (batch_size, num_slices, 256)
         features = features.view(features.size(0), -1)
         features = features.view(batch_size, num_slices, -1)
         
@@ -32,11 +37,15 @@ class MRNetBaseModel(nn.Module):
     
     def forward_with_slice_tracking(self, x):
         """Extended forward pass for explainability.
-        Returns: (logits, slice_indices) where slice_indices has shape (batch_size, 512)"""
+        Returns: (logits, slice_indices) where slice_indices has shape (batch_size, 256)"""
         batch_size, num_slices = x.shape[0], x.shape[1]
         
         x = x.view(batch_size * num_slices, 3, x.shape[3], x.shape[4])
-        features = self.backbone(x)
+        features = self.backbone(x)  
+        
+        # Global average pooling to reduce spatial dimensions
+        features = F.adaptive_avg_pool2d(features, (1, 1))  
+        
         features = features.view(features.size(0), -1)
         features = features.view(batch_size, num_slices, -1)
         
@@ -61,10 +70,12 @@ class MRNetBaseModel(nn.Module):
 
 
 def create_baseline_model():
-    """Create baseline ResNet18 model with ImageNet pretraining.
-    Removes final FC layer (designed for 1000 ImageNet classes) and replaces with 
-    custom FC(512->1) for binary classification."""
-    resnet18 = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-    backbone = nn.Sequential(*list(resnet18.children())[:-1])
+    """Create baseline AlexNet model with ImageNet pretraining.
+    Extracts convolutional features from AlexNet (designed for 1000 ImageNet classes)
+    and replaces with custom FC(256->1) for binary classification.
+    """
+    alexnet = models.alexnet(weights=models.AlexNet_Weights.IMAGENET1K_V1)
+    # Extract only the convolutional feature layers
+    backbone = alexnet.features
     model = MRNetBaseModel(backbone)
     return model

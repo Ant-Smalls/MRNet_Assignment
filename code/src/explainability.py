@@ -123,7 +123,7 @@ def generate_triage_html(model, dataset, device, checkpoint_args, output_path='t
         plt.close()
         img_b64 = base64.b64encode(buf.getvalue()).decode()
         
-        contribution_pct = (case['contribution'] / 512) * 100
+        contribution_pct = (case['contribution'] / 256) * 100
         
         # Dynamic label text based on condition
         label_text = f"Positive ({condition})" if case["true_label"] == 1 else f"Negative (No {condition})"
@@ -134,7 +134,7 @@ def generate_triage_html(model, dataset, device, checkpoint_args, output_path='t
         html.append(f'<p><strong>Overall Confidence:</strong> {case["pred_prob"]:.3f} ({case["pred_prob"]*100:.1f}%)</p>')
         html.append(f'<p><strong>True Label:</strong> {label_text}</p>')
         html.append(f'<p><strong>Most Informative Slice:</strong> #{slice_idx}</p>')
-        html.append(f'<p><strong>Slice Contribution:</strong> {case["contribution"]}/512 features ({contribution_pct:.1f}%)</p>')
+        html.append(f'<p><strong>Slice Contribution:</strong> {case["contribution"]}/256 features ({contribution_pct:.1f}%)</p>')
         html.append(f'<img src="data:image/png;base64,{img_b64}" style="width:100%;max-width:800px;"/>')
         html.append('</div>')
     

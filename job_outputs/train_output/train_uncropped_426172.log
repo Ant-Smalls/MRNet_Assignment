@@ -1,0 +1,403 @@
+==========================================
+Job ID: 426172
+Training ALL UNCROPPED Models
+Start Time: Wed 17 Jun 15:08:12 IST 2026
+==========================================
+
+
+==========================================
+Training: meniscus - sagittal - uncropped
+Wed 17 Jun 15:08:12 IST 2026
+==========================================
+Training: meniscus_sagittal_baseline_uncropped
+Training mode: single-phase
+Device:   cuda
+
+[meniscus-sagittal-train] pos_weight: 1.813 (321 pos, 582 neg)
+Dataset sizes — train: 903, val: 226
+pos_weight: 1.813  (higher = more imbalanced toward negatives)
+Architecture: AlexNet (ImageNet weights)
+Single-phase training: All layers unfrozen from start
+  [single_phase] Epoch 1/50 — train_loss: 0.8837  val_loss: 0.8488  val_auc: 0.7307
+ New best AUC: 0.7307 — checkpoint saved
+  [single_phase] Epoch 2/50 — train_loss: 0.8179  val_loss: 0.7309  val_auc: 0.8093
+ New best AUC: 0.8093 — checkpoint saved
+  [single_phase] Epoch 3/50 — train_loss: 0.7580  val_loss: 0.6762  val_auc: 0.8158
+ New best AUC: 0.8158 — checkpoint saved
+  [single_phase] Epoch 4/50 — train_loss: 0.7069  val_loss: 0.7256  val_auc: 0.8258
+ New best AUC: 0.8258 — checkpoint saved
+  [single_phase] Epoch 5/50 — train_loss: 0.6417  val_loss: 0.6513  val_auc: 0.8368
+ New best AUC: 0.8368 — checkpoint saved
+  [single_phase] Epoch 6/50 — train_loss: 0.6076  val_loss: 0.6518  val_auc: 0.8313
+ No improvement (1/15)
+  [single_phase] Epoch 7/50 — train_loss: 0.5475  val_loss: 0.6828  val_auc: 0.8349
+ No improvement (2/15)
+  [single_phase] Epoch 8/50 — train_loss: 0.4778  val_loss: 0.6301  val_auc: 0.8436
+ New best AUC: 0.8436 — checkpoint saved
+  [single_phase] Epoch 9/50 — train_loss: 0.4285  val_loss: 0.7607  val_auc: 0.8391
+ No improvement (1/15)
+  [single_phase] Epoch 10/50 — train_loss: 0.3574  val_loss: 0.7250  val_auc: 0.8361
+ No improvement (2/15)
+  [single_phase] Epoch 11/50 — train_loss: 0.2846  val_loss: 0.9191  val_auc: 0.8056
+ No improvement (3/15)
+  [single_phase] Epoch 12/50 — train_loss: 0.2249  val_loss: 0.9108  val_auc: 0.8141
+ No improvement (4/15)
+  [single_phase] Epoch 13/50 — train_loss: 0.1118  val_loss: 1.2968  val_auc: 0.8238
+ No improvement (5/15)
+  [single_phase] Epoch 14/50 — train_loss: 0.1040  val_loss: 1.0390  val_auc: 0.8170
+ No improvement (6/15)
+  [single_phase] Epoch 15/50 — train_loss: 0.0863  val_loss: 1.1119  val_auc: 0.8261
+ No improvement (7/15)
+  [single_phase] Epoch 16/50 — train_loss: 0.0515  val_loss: 1.2449  val_auc: 0.8262
+ No improvement (8/15)
+  [single_phase] Epoch 17/50 — train_loss: 0.0229  val_loss: 1.2749  val_auc: 0.8299
+ No improvement (9/15)
+  [single_phase] Epoch 18/50 — train_loss: 0.0192  val_loss: 1.3875  val_auc: 0.8268
+ No improvement (10/15)
+  [single_phase] Epoch 19/50 — train_loss: 0.0145  val_loss: 1.5166  val_auc: 0.8349
+ No improvement (11/15)
+  [single_phase] Epoch 20/50 — train_loss: 0.0159  val_loss: 1.3852  val_auc: 0.8386
+ No improvement (12/15)
+  [single_phase] Epoch 21/50 — train_loss: 0.0077  val_loss: 1.5447  val_auc: 0.8261
+ No improvement (13/15)
+  [single_phase] Epoch 22/50 — train_loss: 0.0135  val_loss: 1.5445  val_auc: 0.8250
+ No improvement (14/15)
+  [single_phase] Epoch 23/50 — train_loss: 0.0057  val_loss: 1.5330  val_auc: 0.8273
+ No improvement (15/15)
+  Early stopping triggered after 23 epochs.
+  Loaded best single_phase weights (AUC: 0.8436)
+
+Best AUC: 0.8436
+Checkpoints saved to: checkpoints/meniscus_sagittal_baseline_uncropped
+SUCCESS: Completed meniscus-sagittal-uncropped
+
+==========================================
+Training: meniscus - axial - uncropped
+Wed 17 Jun 16:07:00 IST 2026
+==========================================
+Training: meniscus_axial_baseline_uncropped
+Training mode: single-phase
+Device:   cuda
+
+[meniscus-axial-train] pos_weight: 1.813 (321 pos, 582 neg)
+Dataset sizes — train: 903, val: 226
+pos_weight: 1.813  (higher = more imbalanced toward negatives)
+Architecture: AlexNet (ImageNet weights)
+Single-phase training: All layers unfrozen from start
+  [single_phase] Epoch 1/50 — train_loss: 0.9012  val_loss: 0.8535  val_auc: 0.7510
+ New best AUC: 0.7510 — checkpoint saved
+  [single_phase] Epoch 2/50 — train_loss: 0.8325  val_loss: 0.7607  val_auc: 0.7793
+ New best AUC: 0.7793 — checkpoint saved
+  [single_phase] Epoch 3/50 — train_loss: 0.7829  val_loss: 0.7439  val_auc: 0.7820
+ New best AUC: 0.7820 — checkpoint saved
+  [single_phase] Epoch 4/50 — train_loss: 0.7364  val_loss: 0.7045  val_auc: 0.8107
+ New best AUC: 0.8107 — checkpoint saved
+  [single_phase] Epoch 5/50 — train_loss: 0.7016  val_loss: 0.7079  val_auc: 0.7889
+ No improvement (1/15)
+  [single_phase] Epoch 6/50 — train_loss: 0.6613  val_loss: 0.8596  val_auc: 0.7933
+ No improvement (2/15)
+  [single_phase] Epoch 7/50 — train_loss: 0.6202  val_loss: 0.6796  val_auc: 0.8022
+ No improvement (3/15)
+  [single_phase] Epoch 8/50 — train_loss: 0.5895  val_loss: 0.6507  val_auc: 0.8175
+ New best AUC: 0.8175 — checkpoint saved
+  [single_phase] Epoch 9/50 — train_loss: 0.5079  val_loss: 0.8520  val_auc: 0.8113
+ No improvement (1/15)
+  [single_phase] Epoch 10/50 — train_loss: 0.4586  val_loss: 0.6997  val_auc: 0.8143
+ No improvement (2/15)
+  [single_phase] Epoch 11/50 — train_loss: 0.3621  val_loss: 0.7006  val_auc: 0.8123
+ No improvement (3/15)
+  [single_phase] Epoch 12/50 — train_loss: 0.2878  val_loss: 0.8524  val_auc: 0.8181
+ New best AUC: 0.8181 — checkpoint saved
+  [single_phase] Epoch 13/50 — train_loss: 0.2325  val_loss: 0.8201  val_auc: 0.7932
+ No improvement (1/15)
+  [single_phase] Epoch 14/50 — train_loss: 0.2022  val_loss: 0.8956  val_auc: 0.7935
+ No improvement (2/15)
+  [single_phase] Epoch 15/50 — train_loss: 0.1597  val_loss: 0.8376  val_auc: 0.8067
+ No improvement (3/15)
+  [single_phase] Epoch 16/50 — train_loss: 0.1287  val_loss: 0.9280  val_auc: 0.8243
+ New best AUC: 0.8243 — checkpoint saved
+  [single_phase] Epoch 17/50 — train_loss: 0.1534  val_loss: 1.1237  val_auc: 0.8017
+ No improvement (1/15)
+  [single_phase] Epoch 18/50 — train_loss: 0.0759  val_loss: 1.3871  val_auc: 0.7960
+ No improvement (2/15)
+  [single_phase] Epoch 19/50 — train_loss: 0.0938  val_loss: 1.0124  val_auc: 0.7994
+ No improvement (3/15)
+  [single_phase] Epoch 20/50 — train_loss: 0.1116  val_loss: 1.8009  val_auc: 0.7638
+ No improvement (4/15)
+  [single_phase] Epoch 21/50 — train_loss: 0.0387  val_loss: 1.1342  val_auc: 0.8064
+ No improvement (5/15)
+  [single_phase] Epoch 22/50 — train_loss: 0.0188  val_loss: 1.4795  val_auc: 0.7876
+ No improvement (6/15)
+  [single_phase] Epoch 23/50 — train_loss: 0.0085  val_loss: 1.8799  val_auc: 0.7924
+ No improvement (7/15)
+  [single_phase] Epoch 24/50 — train_loss: 0.0124  val_loss: 1.4815  val_auc: 0.7890
+ No improvement (8/15)
+  [single_phase] Epoch 25/50 — train_loss: 0.0082  val_loss: 1.6321  val_auc: 0.7980
+ No improvement (9/15)
+  [single_phase] Epoch 26/50 — train_loss: 0.0046  val_loss: 1.6937  val_auc: 0.8009
+ No improvement (10/15)
+  [single_phase] Epoch 27/50 — train_loss: 0.0017  val_loss: 1.8793  val_auc: 0.8014
+ No improvement (11/15)
+  [single_phase] Epoch 28/50 — train_loss: 0.0030  val_loss: 1.8134  val_auc: 0.8176
+ No improvement (12/15)
+  [single_phase] Epoch 29/50 — train_loss: 0.0017  val_loss: 1.7332  val_auc: 0.7986
+ No improvement (13/15)
+  [single_phase] Epoch 30/50 — train_loss: 0.0018  val_loss: 1.6860  val_auc: 0.7968
+ No improvement (14/15)
+  [single_phase] Epoch 31/50 — train_loss: 0.0014  val_loss: 1.9911  val_auc: 0.7936
+ No improvement (15/15)
+  Early stopping triggered after 31 epochs.
+  Loaded best single_phase weights (AUC: 0.8243)
+
+Best AUC: 0.8243
+Checkpoints saved to: checkpoints/meniscus_axial_baseline_uncropped
+SUCCESS: Completed meniscus-axial-uncropped
+
+==========================================
+Training: meniscus - coronal - uncropped
+Wed 17 Jun 17:36:32 IST 2026
+==========================================
+Training: meniscus_coronal_baseline_uncropped
+Training mode: single-phase
+Device:   cuda
+
+[meniscus-coronal-train] pos_weight: 1.813 (321 pos, 582 neg)
+Dataset sizes — train: 903, val: 226
+pos_weight: 1.813  (higher = more imbalanced toward negatives)
+Architecture: AlexNet (ImageNet weights)
+Single-phase training: All layers unfrozen from start
+  [single_phase] Epoch 1/50 — train_loss: 0.8981  val_loss: 0.9336  val_auc: 0.5933
+ New best AUC: 0.5933 — checkpoint saved
+  [single_phase] Epoch 2/50 — train_loss: 0.8847  val_loss: 0.8570  val_auc: 0.6356
+ New best AUC: 0.6356 — checkpoint saved
+  [single_phase] Epoch 3/50 — train_loss: 0.8682  val_loss: 0.8525  val_auc: 0.6509
+ New best AUC: 0.6509 — checkpoint saved
+  [single_phase] Epoch 4/50 — train_loss: 0.8280  val_loss: 0.8325  val_auc: 0.6695
+ New best AUC: 0.6695 — checkpoint saved
+  [single_phase] Epoch 5/50 — train_loss: 0.7862  val_loss: 0.8196  val_auc: 0.7016
+ New best AUC: 0.7016 — checkpoint saved
+  [single_phase] Epoch 6/50 — train_loss: 0.7255  val_loss: 0.8370  val_auc: 0.7299
+ New best AUC: 0.7299 — checkpoint saved
+  [single_phase] Epoch 7/50 — train_loss: 0.6912  val_loss: 0.7638  val_auc: 0.7478
+ New best AUC: 0.7478 — checkpoint saved
+  [single_phase] Epoch 8/50 — train_loss: 0.6377  val_loss: 0.8107  val_auc: 0.7490
+ New best AUC: 0.7490 — checkpoint saved
+  [single_phase] Epoch 9/50 — train_loss: 0.5834  val_loss: 0.9951  val_auc: 0.7663
+ New best AUC: 0.7663 — checkpoint saved
+  [single_phase] Epoch 10/50 — train_loss: 0.5370  val_loss: 0.9700  val_auc: 0.7430
+ No improvement (1/15)
+  [single_phase] Epoch 11/50 — train_loss: 0.4785  val_loss: 0.8356  val_auc: 0.7686
+ New best AUC: 0.7686 — checkpoint saved
+  [single_phase] Epoch 12/50 — train_loss: 0.4561  val_loss: 0.8521  val_auc: 0.7515
+ No improvement (1/15)
+  [single_phase] Epoch 13/50 — train_loss: 0.3813  val_loss: 1.0223  val_auc: 0.7474
+ No improvement (2/15)
+  [single_phase] Epoch 14/50 — train_loss: 0.2792  val_loss: 1.2568  val_auc: 0.7494
+ No improvement (3/15)
+  [single_phase] Epoch 15/50 — train_loss: 0.2862  val_loss: 1.0352  val_auc: 0.7662
+ No improvement (4/15)
+  [single_phase] Epoch 16/50 — train_loss: 0.1477  val_loss: 1.3983  val_auc: 0.7632
+ No improvement (5/15)
+  [single_phase] Epoch 17/50 — train_loss: 0.1329  val_loss: 1.3721  val_auc: 0.7600
+ No improvement (6/15)
+  [single_phase] Epoch 18/50 — train_loss: 0.0909  val_loss: 1.6684  val_auc: 0.7517
+ No improvement (7/15)
+  [single_phase] Epoch 19/50 — train_loss: 0.0895  val_loss: 1.4034  val_auc: 0.7584
+ No improvement (8/15)
+  [single_phase] Epoch 20/50 — train_loss: 0.0462  val_loss: 1.6145  val_auc: 0.7632
+ No improvement (9/15)
+  [single_phase] Epoch 21/50 — train_loss: 0.0414  val_loss: 1.8099  val_auc: 0.7540
+ No improvement (10/15)
+  [single_phase] Epoch 22/50 — train_loss: 0.0290  val_loss: 1.8185  val_auc: 0.7640
+ No improvement (11/15)
+  [single_phase] Epoch 23/50 — train_loss: 0.0347  val_loss: 1.8981  val_auc: 0.7552
+ No improvement (12/15)
+  [single_phase] Epoch 24/50 — train_loss: 0.0188  val_loss: 2.0019  val_auc: 0.7525
+ No improvement (13/15)
+  [single_phase] Epoch 25/50 — train_loss: 0.0188  val_loss: 2.1941  val_auc: 0.7560
+ No improvement (14/15)
+  [single_phase] Epoch 26/50 — train_loss: 0.0299  val_loss: 2.0876  val_auc: 0.7531
+ No improvement (15/15)
+  Early stopping triggered after 26 epochs.
+  Loaded best single_phase weights (AUC: 0.7686)
+
+Best AUC: 0.7686
+Checkpoints saved to: checkpoints/meniscus_coronal_baseline_uncropped
+SUCCESS: Completed meniscus-coronal-uncropped
+
+==========================================
+Training: abnormal - sagittal - uncropped
+Wed 17 Jun 18:41:47 IST 2026
+==========================================
+Training: abnormal_sagittal_baseline_uncropped
+Training mode: single-phase
+Device:   cuda
+
+[abnormal-sagittal-train] pos_weight: 0.235 (731 pos, 172 neg)
+Dataset sizes — train: 903, val: 226
+pos_weight: 0.235  (higher = more imbalanced toward negatives)
+Architecture: AlexNet (ImageNet weights)
+Single-phase training: All layers unfrozen from start
+  [single_phase] Epoch 1/50 — train_loss: 0.2625  val_loss: 0.2704  val_auc: 0.7624
+ New best AUC: 0.7624 — checkpoint saved
+  [single_phase] Epoch 2/50 — train_loss: 0.2393  val_loss: 0.2046  val_auc: 0.8384
+ New best AUC: 0.8384 — checkpoint saved
+  [single_phase] Epoch 3/50 — train_loss: 0.2169  val_loss: 0.2271  val_auc: 0.8314
+ No improvement (1/15)
+  [single_phase] Epoch 4/50 — train_loss: 0.1877  val_loss: 0.1887  val_auc: 0.8739
+ New best AUC: 0.8739 — checkpoint saved
+  [single_phase] Epoch 5/50 — train_loss: 0.1691  val_loss: 0.2556  val_auc: 0.8629
+ No improvement (1/15)
+  [single_phase] Epoch 6/50 — train_loss: 0.1591  val_loss: 0.1853  val_auc: 0.8589
+ No improvement (2/15)
+  [single_phase] Epoch 7/50 — train_loss: 0.1469  val_loss: 0.1821  val_auc: 0.8575
+ No improvement (3/15)
+  [single_phase] Epoch 8/50 — train_loss: 0.1399  val_loss: 0.1950  val_auc: 0.8532
+ No improvement (4/15)
+  [single_phase] Epoch 9/50 — train_loss: 0.1171  val_loss: 0.2024  val_auc: 0.8673
+ No improvement (5/15)
+  [single_phase] Epoch 10/50 — train_loss: 0.1030  val_loss: 0.2062  val_auc: 0.8667
+ No improvement (6/15)
+  [single_phase] Epoch 11/50 — train_loss: 0.0935  val_loss: 0.2302  val_auc: 0.8506
+ No improvement (7/15)
+  [single_phase] Epoch 12/50 — train_loss: 0.0852  val_loss: 0.2505  val_auc: 0.8571
+ No improvement (8/15)
+  [single_phase] Epoch 13/50 — train_loss: 0.0653  val_loss: 0.2251  val_auc: 0.8620
+ No improvement (9/15)
+  [single_phase] Epoch 14/50 — train_loss: 0.0574  val_loss: 0.2494  val_auc: 0.8656
+ No improvement (10/15)
+  [single_phase] Epoch 15/50 — train_loss: 0.0544  val_loss: 0.2722  val_auc: 0.8668
+ No improvement (11/15)
+  [single_phase] Epoch 16/50 — train_loss: 0.0492  val_loss: 0.2298  val_auc: 0.8670
+ No improvement (12/15)
+  [single_phase] Epoch 17/50 — train_loss: 0.0361  val_loss: 0.3029  val_auc: 0.8610
+ No improvement (13/15)
+  [single_phase] Epoch 18/50 — train_loss: 0.0344  val_loss: 0.3025  val_auc: 0.8602
+ No improvement (14/15)
+  [single_phase] Epoch 19/50 — train_loss: 0.0330  val_loss: 0.2751  val_auc: 0.8616
+ No improvement (15/15)
+  Early stopping triggered after 19 epochs.
+  Loaded best single_phase weights (AUC: 0.8739)
+
+Best AUC: 0.8739
+Checkpoints saved to: checkpoints/abnormal_sagittal_baseline_uncropped
+SUCCESS: Completed abnormal-sagittal-uncropped
+
+==========================================
+Training: abnormal - axial - uncropped
+Wed 17 Jun 19:29:40 IST 2026
+==========================================
+Training: abnormal_axial_baseline_uncropped
+Training mode: single-phase
+Device:   cuda
+
+[abnormal-axial-train] pos_weight: 0.235 (731 pos, 172 neg)
+Dataset sizes — train: 903, val: 226
+pos_weight: 0.235  (higher = more imbalanced toward negatives)
+Architecture: AlexNet (ImageNet weights)
+Single-phase training: All layers unfrozen from start
+  [single_phase] Epoch 1/50 — train_loss: 0.2538  val_loss: 0.2066  val_auc: 0.8812
+ New best AUC: 0.8812 — checkpoint saved
+  [single_phase] Epoch 2/50 — train_loss: 0.2067  val_loss: 0.1770  val_auc: 0.8670
+ No improvement (1/15)
+  [single_phase] Epoch 3/50 — train_loss: 0.1808  val_loss: 0.2069  val_auc: 0.8537
+ No improvement (2/15)
+  [single_phase] Epoch 4/50 — train_loss: 0.1611  val_loss: 0.1732  val_auc: 0.8712
+ No improvement (3/15)
+  [single_phase] Epoch 5/50 — train_loss: 0.1523  val_loss: 0.1706  val_auc: 0.8803
+ No improvement (4/15)
+  [single_phase] Epoch 6/50 — train_loss: 0.1214  val_loss: 0.1683  val_auc: 0.8783
+ No improvement (5/15)
+  [single_phase] Epoch 7/50 — train_loss: 0.1106  val_loss: 0.1806  val_auc: 0.8703
+ No improvement (6/15)
+  [single_phase] Epoch 8/50 — train_loss: 0.1005  val_loss: 0.1744  val_auc: 0.8776
+ No improvement (7/15)
+  [single_phase] Epoch 9/50 — train_loss: 0.0846  val_loss: 0.2043  val_auc: 0.8802
+ No improvement (8/15)
+  [single_phase] Epoch 10/50 — train_loss: 0.0726  val_loss: 0.2039  val_auc: 0.8662
+ No improvement (9/15)
+  [single_phase] Epoch 11/50 — train_loss: 0.0562  val_loss: 0.2097  val_auc: 0.8713
+ No improvement (10/15)
+  [single_phase] Epoch 12/50 — train_loss: 0.0535  val_loss: 0.2170  val_auc: 0.8634
+ No improvement (11/15)
+  [single_phase] Epoch 13/50 — train_loss: 0.0479  val_loss: 0.2809  val_auc: 0.8689
+ No improvement (12/15)
+  [single_phase] Epoch 14/50 — train_loss: 0.0350  val_loss: 0.2437  val_auc: 0.8688
+ No improvement (13/15)
+  [single_phase] Epoch 15/50 — train_loss: 0.0307  val_loss: 0.2693  val_auc: 0.8699
+ No improvement (14/15)
+  [single_phase] Epoch 16/50 — train_loss: 0.0267  val_loss: 0.2948  val_auc: 0.8690
+ No improvement (15/15)
+  Early stopping triggered after 16 epochs.
+  Loaded best single_phase weights (AUC: 0.8812)
+
+Best AUC: 0.8812
+Checkpoints saved to: checkpoints/abnormal_axial_baseline_uncropped
+SUCCESS: Completed abnormal-axial-uncropped
+
+==========================================
+Training: abnormal - coronal - uncropped
+Wed 17 Jun 20:15:46 IST 2026
+==========================================
+Training: abnormal_coronal_baseline_uncropped
+Training mode: single-phase
+Device:   cuda
+
+[abnormal-coronal-train] pos_weight: 0.235 (731 pos, 172 neg)
+Dataset sizes — train: 903, val: 226
+pos_weight: 0.235  (higher = more imbalanced toward negatives)
+Architecture: AlexNet (ImageNet weights)
+Single-phase training: All layers unfrozen from start
+  [single_phase] Epoch 1/50 — train_loss: 0.2645  val_loss: 0.2645  val_auc: 0.6406
+ New best AUC: 0.6406 — checkpoint saved
+  [single_phase] Epoch 2/50 — train_loss: 0.2451  val_loss: 0.2223  val_auc: 0.7877
+ New best AUC: 0.7877 — checkpoint saved
+  [single_phase] Epoch 3/50 — train_loss: 0.2273  val_loss: 0.2121  val_auc: 0.8263
+ New best AUC: 0.8263 — checkpoint saved
+  [single_phase] Epoch 4/50 — train_loss: 0.2063  val_loss: 0.2294  val_auc: 0.8322
+ New best AUC: 0.8322 — checkpoint saved
+  [single_phase] Epoch 5/50 — train_loss: 0.1850  val_loss: 0.1999  val_auc: 0.8510
+ New best AUC: 0.8510 — checkpoint saved
+  [single_phase] Epoch 6/50 — train_loss: 0.1682  val_loss: 0.1840  val_auc: 0.8804
+ New best AUC: 0.8804 — checkpoint saved
+  [single_phase] Epoch 7/50 — train_loss: 0.1450  val_loss: 0.1932  val_auc: 0.8598
+ No improvement (1/15)
+  [single_phase] Epoch 8/50 — train_loss: 0.1306  val_loss: 0.2835  val_auc: 0.8604
+ No improvement (2/15)
+  [single_phase] Epoch 9/50 — train_loss: 0.1155  val_loss: 0.1756  val_auc: 0.8735
+ No improvement (3/15)
+  [single_phase] Epoch 10/50 — train_loss: 0.0933  val_loss: 0.2079  val_auc: 0.8561
+ No improvement (4/15)
+  [single_phase] Epoch 11/50 — train_loss: 0.0686  val_loss: 0.2449  val_auc: 0.8786
+ No improvement (5/15)
+  [single_phase] Epoch 12/50 — train_loss: 0.0562  val_loss: 0.2354  val_auc: 0.8586
+ No improvement (6/15)
+  [single_phase] Epoch 13/50 — train_loss: 0.0567  val_loss: 0.2099  val_auc: 0.8611
+ No improvement (7/15)
+  [single_phase] Epoch 14/50 — train_loss: 0.0418  val_loss: 0.2420  val_auc: 0.8540
+ No improvement (8/15)
+  [single_phase] Epoch 15/50 — train_loss: 0.0297  val_loss: 0.2540  val_auc: 0.8803
+ No improvement (9/15)
+  [single_phase] Epoch 16/50 — train_loss: 0.0230  val_loss: 0.2970  val_auc: 0.8679
+ No improvement (10/15)
+  [single_phase] Epoch 17/50 — train_loss: 0.0225  val_loss: 0.2782  val_auc: 0.8683
+ No improvement (11/15)
+  [single_phase] Epoch 18/50 — train_loss: 0.0180  val_loss: 0.2532  val_auc: 0.8712
+ No improvement (12/15)
+  [single_phase] Epoch 19/50 — train_loss: 0.0136  val_loss: 0.2963  val_auc: 0.8735
+ No improvement (13/15)
+  [single_phase] Epoch 20/50 — train_loss: 0.0106  val_loss: 0.3033  val_auc: 0.8740
+ No improvement (14/15)
+  [single_phase] Epoch 21/50 — train_loss: 0.0107  val_loss: 0.4326  val_auc: 0.8692
+ No improvement (15/15)
+  Early stopping triggered after 21 epochs.
+  Loaded best single_phase weights (AUC: 0.8804)
+
+Best AUC: 0.8804
+Checkpoints saved to: checkpoints/abnormal_coronal_baseline_uncropped
+SUCCESS: Completed abnormal-coronal-uncropped
+
+==========================================
+All UNCROPPED training completed
+End Time: Wed 17 Jun 21:08:16 IST 2026
+==========================================

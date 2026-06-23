@@ -5,14 +5,14 @@ import torchvision.models as models
 
 
 class MRNetBaseModel(nn.Module):
-    """AlexNet backbone with max pooling across slices for MRI volume classification.
-    Architecture: AlexNet features -> Global Avg Pool -> Max pool slices -> FC(256->1)
+    """Backbone with max pooling across slices for MRI volume classification.
+    Architecture: backbone features -> Global Avg Pool -> Max pool slices -> FC(feature_dim->1)
     Modeling after original MRNet architecture from the paper."""
-    
-    def __init__(self, backbone):
+
+    def __init__(self, backbone, feature_dim=256):
         super().__init__()
         self.backbone = backbone
-        self.fc = nn.Linear(256, 1)
+        self.fc = nn.Linear(feature_dim, 1)
     
     def forward(self, x):
         """Args: x (batch_size, num_slices, 3, H, W)
@@ -37,7 +37,7 @@ class MRNetBaseModel(nn.Module):
     
     def forward_with_slice_tracking(self, x):
         """Extended forward pass for explainability.
-        Returns: (logits, slice_indices) where slice_indices has shape (batch_size, 256)"""
+        Returns: (logits, slice_indices) where slice_indices has shape (batch_size, feature_dim)"""
         batch_size, num_slices = x.shape[0], x.shape[1]
         
         x = x.view(batch_size * num_slices, 3, x.shape[3], x.shape[4])

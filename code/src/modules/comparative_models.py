@@ -73,7 +73,7 @@ def load_radimagenet_model(architecture):
     )
 
     checkpoint = torch.load(
-        "models/ResNet50.pt",
+        "Models/ResNet50.pt",
         map_location="cpu"
     )
 

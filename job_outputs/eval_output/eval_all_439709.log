@@ -1,0 +1,94 @@
+==========================================
+Job ID: 439709
+Evaluating ALL UNCROPPED Models
+Start Time: Tue 23 Jun 08:31:23 IST 2026
+==========================================
+
+==========================================
+Evaluating: ACL, Meniscus, Abnormal
+Data modes: Uncropped, Cropped
+Architecture: Baseline (AlexNet-ImageNet)
+==========================================
+
+Evaluating condition='all' on cuda
+
+=== acl | AlexNet-ImageNet | uncropped ===
+  [load] acl_axial_baseline_uncropped  (val_auc=0.7913)  <- best_single_phase.pth
+  [load] acl_coronal_baseline_uncropped  (val_auc=0.8076)  <- best_single_phase.pth
+  [load] acl_sagittal_baseline_uncropped  (val_auc=0.8945)  <- best_single_phase.pth
+
+=== acl | AlexNet-ImageNet | cropped ===
+  [load] acl_axial_baseline_cropped  (val_auc=0.8541)  <- best_single_phase.pth
+  [load] acl_coronal_baseline_cropped  (val_auc=0.8082)  <- best_single_phase.pth
+  [load] acl_sagittal_baseline_cropped  (val_auc=0.9085)  <- best_single_phase.pth
+
+Paired AUC-difference tests: {'cropping_effect_baseline': {'auc_diff_b_minus_a': np.float64(0.02244668911335579), 'ci_low': np.float64(-0.0011563624637287268), 'ci_high': np.float64(0.05358214285714277), 'p_two_sided': np.float64(0.066), 'significant_at_0.05': False}}
+
+Saved metrics -> results/results_acl.json
+
+======================================================================
+Fused results: acl
+======================================================================
+      AlexNet-ImageNet | uncropped | AUC 0.923 [0.870, 0.962]  Sens 0.704 [0.580, 0.818]  Spec 0.924 [0.861, 0.983]  F1 0.784 [0.683, 0.864]
+      AlexNet-ImageNet | cropped   | AUC 0.945 [0.899, 0.979]  Sens 0.852 [0.755, 0.938]  Spec 0.894 [0.810, 0.961]  F1 0.860 [0.780, 0.920]
+
+2x2 fused AUC: {'baseline_uncropped': np.float64(0.9225589225589226), 'baseline_cropped': np.float64(0.9450056116722784), 'comparative_uncropped': None, 'comparative_cropped': None}
+Effects: {'note': 'Full 2x2 effects need all four cells (comparative requires Role 3).'}
+  [triage] exported 120 cases -> results/acl_triage.json
+
+=== meniscus | AlexNet-ImageNet | uncropped ===
+  [load] meniscus_axial_baseline_uncropped  (val_auc=0.8243)  <- best_single_phase.pth
+  [load] meniscus_coronal_baseline_uncropped  (val_auc=0.7686)  <- best_single_phase.pth
+  [load] meniscus_sagittal_baseline_uncropped  (val_auc=0.8436)  <- best_single_phase.pth
+
+=== meniscus | AlexNet-ImageNet | cropped ===
+  [load] meniscus_axial_baseline_cropped  (val_auc=0.8142)  <- best_single_phase.pth
+  [load] meniscus_coronal_baseline_cropped  (val_auc=0.8007)  <- best_single_phase.pth
+  [load] meniscus_sagittal_baseline_cropped  (val_auc=0.8127)  <- best_single_phase.pth
+
+Paired AUC-difference tests: {'cropping_effect_baseline': {'auc_diff_b_minus_a': np.float64(0.01640271493212664), 'ci_low': np.float64(-0.041128966018961856), 'ci_high': np.float64(0.07581314273961326), 'p_two_sided': np.float64(0.65), 'significant_at_0.05': False}}
+
+Saved metrics -> results/results_meniscus.json
+
+======================================================================
+Fused results: meniscus
+======================================================================
+      AlexNet-ImageNet | uncropped | AUC 0.806 [0.719, 0.881]  Sens 0.846 [0.740, 0.935]  Spec 0.632 [0.517, 0.747]  F1 0.727 [0.624, 0.809]
+      AlexNet-ImageNet | cropped   | AUC 0.822 [0.739, 0.892]  Sens 0.942 [0.871, 1.000]  Spec 0.441 [0.319, 0.557]  F1 0.705 [0.600, 0.780]
+
+2x2 fused AUC: {'baseline_uncropped': np.float64(0.8059954751131222), 'baseline_cropped': np.float64(0.8223981900452488), 'comparative_uncropped': None, 'comparative_cropped': None}
+Effects: {'note': 'Full 2x2 effects need all four cells (comparative requires Role 3).'}
+  [triage] exported 120 cases -> results/meniscus_triage.json
+
+=== abnormal | AlexNet-ImageNet | uncropped ===
+  [load] abnormal_axial_baseline_uncropped  (val_auc=0.8812)  <- best_single_phase.pth
+  [load] abnormal_coronal_baseline_uncropped  (val_auc=0.8804)  <- best_single_phase.pth
+  [load] abnormal_sagittal_baseline_uncropped  (val_auc=0.8739)  <- best_single_phase.pth
+
+=== abnormal | AlexNet-ImageNet | cropped ===
+  [load] abnormal_axial_baseline_cropped  (val_auc=0.8780)  <- best_single_phase.pth
+  [load] abnormal_coronal_baseline_cropped  (val_auc=0.8502)  <- best_single_phase.pth
+  [load] abnormal_sagittal_baseline_cropped  (val_auc=0.8995)  <- best_single_phase.pth
+
+Paired AUC-difference tests: {'cropping_effect_baseline': {'auc_diff_b_minus_a': np.float64(0.026105263157894742), 'ci_low': np.float64(-0.025576036096256635), 'ci_high': np.float64(0.07640071186778181), 'p_two_sided': np.float64(0.33), 'significant_at_0.05': False}}
+
+Saved metrics -> results/results_abnormal.json
+
+======================================================================
+Fused results: abnormal
+======================================================================
+      AlexNet-ImageNet | uncropped | AUC 0.875 [0.803, 0.936]  Sens 0.947 [0.903, 0.989]  Spec 0.440 [0.227, 0.632]  F1 0.905 [0.862, 0.943]
+      AlexNet-ImageNet | cropped   | AUC 0.901 [0.833, 0.954]  Sens 0.968 [0.928, 1.000]  Spec 0.440 [0.250, 0.654]  F1 0.915 [0.874, 0.957]
+
+2x2 fused AUC: {'baseline_uncropped': np.float64(0.8749473684210526), 'baseline_cropped': np.float64(0.9010526315789473), 'comparative_uncropped': None, 'comparative_cropped': None}
+Effects: {'note': 'Full 2x2 effects need all four cells (comparative requires Role 3).'}
+  [triage] exported 120 cases -> results/abnormal_triage.json
+
+Master table (6 rows) -> results/master_table.csv
+
+Done. Results in results/
+
+==========================================
+All evaluations completed at Tue 23 Jun 08:34:59 IST 2026
+Exit code: 0
+==========================================

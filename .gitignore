@@ -11,10 +11,6 @@ checkpoints/
 # TensorBoard logs
 runs/
 
-# Results and visualizations
-results/
-visualizations/
-
 # Python cache
 __pycache__/
 *.py[cod]

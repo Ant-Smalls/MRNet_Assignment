@@ -8,7 +8,7 @@ Reuses MRNetBaseModel from Role 2, swaps out backbone only.
 import torch
 import torch.nn as nn
 from torchvision import models
-from baseline_models import MRNetBaseModel
+from .baseline_models import MRNetBaseModel
 
 
 def create_comparative_model(architecture='resnet50'):

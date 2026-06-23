@@ -119,7 +119,7 @@ def create_model(args):
         return create_baseline_model()
     else:
         print("Architecture: ResNet50 (RadImageNet weights)")
-        return create_comparative_model()
+        return create_comparative_model('radimagenet_resnet50')
 
 
 # ---------------------------------------------------------------------------

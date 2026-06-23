@@ -50,7 +50,7 @@ def parse_args():
     parser.add_argument('--lr_phase2',       type=float, default=1e-4,
                         help='Learning rate for phase 2 in two-phase training')
     parser.add_argument('--weight_decay',    type=float, default=1e-4)
-    parser.add_argument('--patience',        type=int,   default=5,
+    parser.add_argument('--patience',        type=int,   default=10,
                         help='Early stopping patience (epochs without AUC improvement)')
     parser.add_argument('--optimizer',       type=str,   default='adamw', choices=['adamw', 'sgd'],
                         help='Optimizer to use for training')
@@ -115,7 +115,7 @@ def create_data_loaders(args):
 def create_model(args):
     """Instantiate the correct architecture."""
     if args.architecture == 'baseline':
-        print("Architecture: ResNet18 (ImageNet weights)")
+        print("Architecture: AlexNet (ImageNet weights)")
         return create_baseline_model()
     else:
         print("Architecture: ResNet50 (RadImageNet weights)")
@@ -205,7 +205,7 @@ def validate(model, dataloader, criterion, device):
     if len(unique_labels) < 2:
         auc = 0.5   # undefined —> return chance level
     else:
-        auc = roc_auc_score(all_labels, all_probs)
+        auc = float(roc_auc_score(all_labels, all_probs))
 
     return avg_loss, auc
 
@@ -287,7 +287,7 @@ def train_phase(model, train_loader, val_loader, optimizer, criterion,
             break
 
     # Reload best weights before returning so Phase 2 starts from the best Phase 1 state
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     print(f"  Loaded best {phase_name} weights (AUC: {best_auc:.4f})")
 

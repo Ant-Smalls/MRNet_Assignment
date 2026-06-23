@@ -11,10 +11,10 @@
 # Number of CPU cores
 #SBATCH --ntasks-per-node=4
 # Expected runtime: 30 minutes 
-#SBATCH -t 01:00:00
+#SBATCH -t 00:30:00
 # Email notifications
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=student_email@ucdconnect.ie
+#SBATCH --mail-user=student@ucdconnect.ie
 # Output logs
 #SBATCH --output=eval_output/eval_%j.log
 #SBATCH --error=eval_output/eval_%j.err
@@ -39,18 +39,22 @@ source venv/bin/activate
 
 # Create output directory for logs
 mkdir -p eval_output
+mkdir -p results
 
 echo "=========================================="
 echo "Starting Evaluation Job at $(date)"
 echo "=========================================="
 echo ""
 
-# Update the --checkpoint path to the actual best model saved during training & data from cropped / uncropped
-python3 code/src/minimal_eval.py \
-  --condition meniscus \
-  --plane sagittal \
-  --data_mode uncropped \
-  --checkpoint checkpoints/meniscus_sagittal_baseline_uncropped_best.pth
+# Run evaluation for ACL with both uncropped and cropped data
+python3 code/src/evaluation.py \
+    --condition acl \
+    --architectures baseline \
+    --data_modes uncropped cropped \
+    --data_dir code/src/data/ \
+    --checkpoint_dir checkpoints/ \
+    --output_dir results/ \
+    --n_bootstraps 1000
 
 JOB_EXIT_CODE=$?
 
@@ -69,11 +73,11 @@ echo "=========================================="
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=4
-#SBATCH -t 02:00:00  # 2 hours for 9 evaluations
+#SBATCH -t 01:00:00  # 1 hours for 18 evaluations
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=student@ucdconnect.ie
-#SBATCH --output=eval_output/eval_uncropped_%j.log
-#SBATCH --error=eval_output/eval_uncropped_%j.err
+#SBATCH --output=eval_output/eval_all_%j.log
+#SBATCH --error=eval_output/eval_all_%j.err
 
 echo "=========================================="
 echo "Job ID: $SLURM_JOB_ID"
@@ -85,41 +89,29 @@ echo ""
 cd /home/people/{student_number}/MRNet-assignment
 source venv/bin/activate
 mkdir -p eval_output
+mkdir -p results
 
-CONDITIONS=("acl" "meniscus" "abnormal")
-PLANES=("sagittal" "axial" "coronal")
-DATA_MODE="uncropped"
+echo "=========================================="
+echo "Evaluating: ACL, Meniscus, Abnormal"
+echo "Data modes: Uncropped, Cropped"
+echo "Architecture: Baseline (AlexNet-ImageNet)"
+echo "=========================================="
+echo ""
 
-for condition in "${CONDITIONS[@]}"; do
-  for plane in "${PLANES[@]}"; do
-    
-    CHECKPOINT="checkpoints/${condition}_${plane}_baseline_${DATA_MODE}_best.pth"
-    
-    echo ""
-    echo "=========================================="
-    echo "Evaluating: $condition - $plane - $DATA_MODE"
-    echo "Checkpoint: $CHECKPOINT"
-    echo "$(date)"
-    echo "=========================================="
-    
-    python3 code/src/minimal_eval.py \
-      --condition $condition \
-      --plane $plane \
-      --data_mode $DATA_MODE \
-      --checkpoint $CHECKPOINT
-    
-    EXIT_CODE=$?
-    if [ $EXIT_CODE -ne 0 ]; then
-      echo "ERROR: Evaluation failed for $condition-$plane-$DATA_MODE"
-    else
-      echo "SUCCESS: Completed $condition-$plane-$DATA_MODE"
-    fi
-    
-  done
-done
+# Run evaluation for ALL conditions
+python3 code/src/evaluation.py \
+    --condition all \
+    --architectures baseline \
+    --data_modes uncropped cropped \
+    --data_dir code/src/data/ \
+    --checkpoint_dir checkpoints/ \
+    --output_dir results/ \
+    --n_bootstraps 1000 \
+    --seed 42
 
+JOB_EXIT_CODE=$?
 echo ""
 echo "=========================================="
-echo "All UNCROPPED evaluation completed"
-echo "End Time: $(date)"
+echo "All evaluations completed at $(date)"
+echo "Exit code: $JOB_EXIT_CODE"
 echo "=========================================="

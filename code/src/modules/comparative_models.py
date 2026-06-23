@@ -55,25 +55,34 @@ def create_comparative_model(architecture='resnet50'):
 
 def load_radimagenet_model(architecture):
     """
-    Load model with RadImageNet pretrained weights.
-    
-    Args:
-        architecture (str): 'radimagenet_resnet18' or 'radimagenet_resnet50'
-        
-    Returns:
-        nn.Module: Backbone with RadImageNet weights
-        
-    TODO:
-    - Download RadImageNet weights if needed
-    - Load appropriate ResNet architecture
-    - Load pretrained weights
-    - Remove final FC layer
-    - Return backbone
-    
-    Note: RadImageNet weights need to be obtained separately from:
-    https://github.com/BMEII-AI/RadImageNet
+    Load RadImageNet pretrained ResNet50 backbone.
     """
-    pass
+
+    if architecture != "radimagenet_resnet50":
+        raise NotImplementedError(
+            f"{architecture} not supported."
+        )
+
+    resnet50 = models.resnet50(weights=None)
+
+    backbone = nn.Sequential(
+        *list(resnet50.children())[:-1]
+    )
+
+    checkpoint = torch.load(
+        "models/ResNet50.pt",
+        map_location="cpu"
+    )
+
+    # Remove "backbone." prefix from checkpoint keys
+    new_checkpoint = {}
+    for k, v in checkpoint.items():
+        if k.startswith("backbone."):
+            new_checkpoint[k.replace("backbone.", "", 1)] = v
+
+    backbone.load_state_dict(new_checkpoint)
+
+    return backbone
 
 
 if __name__ == '__main__':

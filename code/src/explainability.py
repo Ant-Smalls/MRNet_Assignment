@@ -1,184 +1,351 @@
+"""
+Explainability: Grad-CAM heatmap generation for MRNet AlexNet models.
+
+Runs Grad-CAM on the most informative slice of each validation patient,
+across all conditions and planes, and saves results to a JSON file
+that the triage dashboard can embed.
+
+Usage (runs all 18 checkpoints automatically):
+    python code/src/explainability.py \
+        --checkpoint_dir checkpoints/ \
+        --data_dir code/src/data/ \
+        --output_dir job_outputs/gradcam/ \
+        --data_mode cropped \
+        --n_cases 10
+
+Or for a single checkpoint:
+    python code/src/explainability.py \
+        --checkpoint checkpoints/acl_axial_baseline_cropped/best_single_phase.pth \
+        --data_dir code/src/data/ \
+        --data_mode cropped
+"""
+
 import argparse
 import base64
+import json
 from io import BytesIO
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import mode
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
+import sys
+sys.path.insert(0, str(Path(__file__).parent))
 from modules.data_preprocessing_transformation import ValidMRNetDataset
 from modules.baseline_models import create_baseline_model
 
-class SingleSliceWrapper(nn.Module):
-    """Wrapper to make MRNetBaseModel compatible with GradCAM.
-    Converts 4D input (batch, 3, H, W) to 5D (batch, 1, 3, H, W)."""
+
+# ── GradCAM wrapper ─────────────────────────────────────────────────────────
+
+class SliceWrapper(nn.Module):
+    """Wraps MRNetBaseModel to accept a single 4D slice for GradCAM compatibility.
+    GradCAM provides (B, 3, H, W); the base model expects (B, S, 3, H, W)."""
     def __init__(self, model):
         super().__init__()
         self.model = model
-        # Expose backbone for GradCAM to hook into
         self.backbone = model.backbone
         self.fc = model.fc
-    
+
     def forward(self, x):
-        # GradCAM provides 4D, model expects 5D
-        x = x.unsqueeze(1)  # (batch, 3, H, W) -> (batch, 1, 3, H, W)
-        return self.model(x)
+        return self.model(x.unsqueeze(1))
+
+
+def gradcam_for_slice(model, slice_tensor, device):
+    """Return a (H, W) Grad-CAM heatmap for one slice.
+
+    AlexNet features layer indices:
+      0  Conv2d(3,64,11,4,2)
+      1  ReLU
+      2  MaxPool2d
+      3  Conv2d(64,192,5,1,2)
+      4  ReLU
+      5  MaxPool2d
+      6  Conv2d(192,384,3,1,1)
+      7  ReLU
+      8  Conv2d(384,256,3,1,1)
+      9  ReLU
+      10 Conv2d(256,256,3,1,1)   <- target: last conv before final relu
+      11 ReLU
+      12 MaxPool2d
+    """
+    wrapped = SliceWrapper(model).to(device)
+    target_layer = [wrapped.backbone[10]]
+    cam = GradCAM(model=wrapped, target_layers=target_layer)
+    grayscale = cam(input_tensor=slice_tensor.unsqueeze(0).to(device))
+    return grayscale[0]
+
+
+# ── Inference helpers ────────────────────────────────────────────────────────
+
+def most_informative_slice(model, exam_tensor, device):
+    """Return the slice index that contributed the most features via max-pool."""
+    with torch.no_grad():
+        logits, slice_indices, pooled = model.forward_with_slice_tracking(
+            exam_tensor.unsqueeze(0).to(device)
+        )
+    # Ignore channels where the max activation was 0 (dead neurons)
+    # Otherwise torch.max defaults to slice 0 for all zero-channels, skewing the mode!
+    pooled = pooled.cpu().numpy().flatten()
+    idxs = slice_indices.cpu().numpy().flatten()
+    active_idxs = idxs[pooled > 0]
+    
+    if len(active_idxs) == 0:
+        return int(mode(idxs, keepdims=False)[0])  # Fallback
+    return int(mode(active_idxs, keepdims=False)[0])
+
+
+def run_inference(model, dataset, device):
+    """Return list of dicts with pred_prob, true_label, slice_idx per patient."""
+    results = []
+    for i in range(len(dataset)):
+        exam, label = dataset[i]
+        exam_t = exam.unsqueeze(0).to(device)
+        with torch.no_grad():
+            logits = model(exam_t)
+            prob = torch.sigmoid(logits).item()
+        s_idx = most_informative_slice(model, exam, device)
+        results.append({
+            'idx': i,
+            'true_label': int(label.item()),
+            'pred_prob': float(prob),
+            'slice_idx': s_idx,
+        })
+    return results
+
+
+# ── Visualisation ────────────────────────────────────────────────────────────
+
+def normalise(arr):
+    lo, hi = arr.min(), arr.max()
+    return (arr - lo) / (hi - lo + 1e-8)
+
+
+def figure_to_b64(fig):
+    buf = BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight', dpi=100)
+    plt.close(fig)
+    return base64.b64encode(buf.getvalue()).decode()
+
+
+def make_gradcam_figure(exam, slice_idx, heatmap, pred_prob, true_label,
+                         condition, plane, patient_id):
+    """Create a side-by-side original / Grad-CAM overlay figure."""
+    raw_slice = exam[slice_idx, 0, :, :].numpy()
+    rgb = np.stack([normalise(raw_slice)] * 3, axis=2).astype(np.float32)
+
+    overlay = show_cam_on_image(rgb, heatmap, use_rgb=True, image_weight=0.55)
+
+    outcome = _outcome(pred_prob, true_label)
+    outcome_color = {'TP': '#059669', 'TN': '#0891b2',
+                     'FP': '#dc2626', 'FN': '#d97706'}[outcome]
+
+    fig, axes = plt.subplots(1, 2, figsize=(9, 4.2))
+    fig.patch.set_facecolor('#f8fafc')
+
+    for ax, img, title, cmap in zip(
+        axes,
+        [raw_slice, overlay],
+        [f'Original MRI — Slice #{slice_idx}', 'Grad-CAM Attention Overlay'],
+        ['gray', None]
+    ):
+        ax.imshow(img, cmap=cmap)
+        ax.set_title(title, fontsize=10, fontweight='600', pad=6, color='#1e293b')
+        ax.axis('off')
+
+    label_str = f"{'Positive' if true_label else 'Negative'} · "
+    pred_str  = f"Pred: {pred_prob*100:.1f}% · Outcome: {outcome}"
+    fig.suptitle(
+        f"Patient {patient_id} — {condition.upper()} {plane.capitalize()}\n"
+        f"{label_str}{pred_str}",
+        fontsize=9.5, color='#334155', y=1.01
+    )
+    # Colour the outcome label
+    fig.text(0.5, -0.01,
+             f'■ {outcome}',
+             ha='center', fontsize=9, fontweight='700',
+             color=outcome_color, transform=fig.transFigure)
+    fig.tight_layout()
+    return fig
+
+
+def _outcome(prob, true_label, thr=0.5):
+    pred = prob >= thr
+    real = true_label == 1
+    if pred and real:     return 'TP'
+    if not pred and not real: return 'TN'
+    if pred and not real: return 'FP'
+    return 'FN'
+
+
+# ── Per-checkpoint pipeline ──────────────────────────────────────────────────
+
+def process_checkpoint(ckpt_dir, data_dir, data_mode, n_cases, device):
+    """Run Grad-CAM for one condition/plane checkpoint. Returns a result dict."""
+    ckpt_path = _find_checkpoint(ckpt_dir)
+    if ckpt_path is None:
+        return None
+
+    config_path = Path(ckpt_dir) / 'config.json'
+    if not config_path.exists():
+        print(f"  [skip] no config.json in {ckpt_dir}")
+        return None
+
+    with open(config_path) as f:
+        cfg = json.load(f)
+
+    condition = cfg['condition']
+    plane     = cfg['plane']
+    ckpt_data_mode = cfg.get('data_mode', data_mode)
+
+    if ckpt_data_mode != data_mode:
+        return None
+
+    print(f"  Processing: {condition} / {plane} / {ckpt_data_mode}")
+
+    model = create_baseline_model().to(device)
+    ckpt  = torch.load(ckpt_path, map_location=device, weights_only=False)
+    state = ckpt.get('model_state_dict', ckpt)
+    model.load_state_dict(state)
+    model.eval()
+
+    dataset = ValidMRNetDataset(
+        root_dir=data_dir,
+        condition=condition,
+        plane=plane,
+        data_mode=data_mode,
+    )
+
+    if len(dataset) == 0:
+        print(f"  [warn] empty dataset for {condition}/{plane}/{data_mode}")
+        return None
+
+    print(f"    Loaded {len(dataset)} patients, running inference…")
+    preds = run_inference(model, dataset, device)
+
+    # Select n_cases evenly spaced across the patient list.
+    # Using patient-index order (not outcome order) ensures that BOTH the
+    # cropped and uncropped models select the EXACT SAME patients,
+    # which prevents "Patient not in selection" in the dashboard comparison.
+    preds_by_idx = sorted(preds, key=lambda p: p['idx'])
+    n_total = len(preds_by_idx)
+    if n_total <= n_cases:
+        selected = preds_by_idx
+    else:
+        step = n_total / n_cases
+        selected = [preds_by_idx[int(i * step)] for i in range(n_cases)]
+
+    print(f"    Generating Grad-CAM for {len(selected)} cases…")
+    cases_out = []
+    for case in selected:
+        exam, _ = dataset[case['idx']]
+        s_idx   = case['slice_idx']
+        heatmap = gradcam_for_slice(
+            model,
+            exam[s_idx],        # (3, H, W)
+            device
+        )
+        fig = make_gradcam_figure(
+            exam=exam,
+            slice_idx=s_idx,
+            heatmap=heatmap,
+            pred_prob=case['pred_prob'],
+            true_label=case['true_label'],
+            condition=condition,
+            plane=plane,
+            patient_id=dataset.file_paths[case['idx']].split('/')[-1].replace('.npy', '')
+        )
+        img_b64 = figure_to_b64(fig)
+        cases_out.append({
+            **case,
+            'outcome': _outcome(case['pred_prob'], case['true_label']),
+            'img_b64': img_b64,
+        })
+
+    return {
+        'condition': condition,
+        'plane': plane,
+        'data_mode': data_mode,
+        'val_auc': float(ckpt.get('val_auc', 0)),
+        'n_total': len(dataset),
+        'cases': cases_out,
+    }
+
+
+def _find_checkpoint(model_dir):
+    for name in ['best_phase2.pth', 'best_single_phase.pth', 'best_phase1.pth']:
+        p = Path(model_dir) / name
+        if p.exists():
+            return p
+    hits = list(Path(model_dir).glob('best_*.pth'))
+    return hits[0] if hits else None
+
+
+# ── Entry points ─────────────────────────────────────────────────────────────
+
+def run_all(checkpoint_dir, data_dir, output_dir, data_mode, n_cases, device):
+    """Iterate every checkpoint subdirectory and collect Grad-CAM results."""
+    ckpt_root = Path(checkpoint_dir)
+    out_root  = Path(output_dir)
+    out_root.mkdir(parents=True, exist_ok=True)
+
+    all_results = []
+    for ckpt_dir in sorted(ckpt_root.iterdir()):
+        if not ckpt_dir.is_dir():
+            continue
+        result = process_checkpoint(ckpt_dir, data_dir, data_mode, n_cases, device)
+        if result:
+            all_results.append(result)
+
+    out_path = out_root / f'gradcam_{data_mode}.json'
+    with open(out_path, 'w') as f:
+        json.dump(all_results, f)
+    print(f"\nGrad-CAM results saved → {out_path}")
+    return all_results
+
+
+def run_single(ckpt_path, data_dir, data_mode, n_cases, device):
+    """Run Grad-CAM for a single checkpoint (reads config.json from same dir)."""
+    ckpt_dir = Path(ckpt_path).parent
+    result = process_checkpoint(ckpt_dir, data_dir, data_mode, n_cases, device)
+    if result:
+        print(f"\nDone: {result['condition']} / {result['plane']} / {result['data_mode']}")
+        print(f"  Cases: {len(result['cases'])} | Val AUC: {result['val_auc']:.4f}")
+    return result
+
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Generate Grad-CAM explainability HTML report')
-    parser.add_argument('--checkpoint', type=str, required=True, help='Path to checkpoint file')
-    parser.add_argument('--data_mode', type=str, required=True, choices=['uncropped', 'cropped'])
-    parser.add_argument('--output', type=str, default='triage_report.html', help='Output HTML file')
-    parser.add_argument('--data_dir', type=str, default='src/data/')
-    return parser.parse_args()
-
-
-def get_gradcam_heatmap(model, exam, target_slice_idx):
-    """Generate Grad-CAM heatmap for a specific slice."""
-    wrapped_model = SingleSliceWrapper(model)
-    target_layers = [wrapped_model.backbone[-2]]
-    cam = GradCAM(model=wrapped_model, target_layers=target_layers)
-    
-    # Extract single slice and generate heatmap
-    slice_input = exam[:, target_slice_idx, :, :, :]
-    grayscale_cam = cam(input_tensor=slice_input)
-    
-    return grayscale_cam[0]
-
-
-def generate_triage_html(model, dataset, device, checkpoint_args, output_path='triage_report.html'):
-    """Generate static HTML with top-20 cases showing 4 visualization components."""
-    model.eval()
-    predictions = []
-    
-    # Extract condition and plane for dynamic naming
-    condition = checkpoint_args['condition'].upper()
-    plane = checkpoint_args['plane'].capitalize()
-    
-    # Run inference on all validation data
-    for idx in range(len(dataset)):
-        exam, label = dataset[idx]
-        exam_input = exam.unsqueeze(0).to(device)
-        
-        with torch.no_grad():
-            logits, slice_indices = model.forward_with_slice_tracking(exam_input)
-            prob = torch.sigmoid(logits).item()
-        
-        # Find most informative slice (mode of slice indices)
-        most_informative_slice = mode(slice_indices.cpu().numpy(), axis=1, keepdims=False)[0][0]
-        contribution_count = (slice_indices == most_informative_slice).sum().item()
-        
-        predictions.append({
-            'idx': idx,
-            'true_label': label.item(),
-            'pred_prob': prob,
-            'slice_idx': most_informative_slice,
-            'contribution': contribution_count
-        })
-    
-    # Sort by confidence and select top-20 (10 positive, 10 negative)
-    predictions.sort(key=lambda x: x['pred_prob'], reverse=True)
-    top_positive = [p for p in predictions if p['pred_prob'] > 0.5][:10]
-    top_negative = [p for p in predictions if p['pred_prob'] <= 0.5][-10:]
-    top_cases = top_positive + top_negative
-    
-    # Build HTML
-    html = [f'<html><head><title>{condition} Triage Report</title>']
-    html.append('<style>body{font-family:Arial;} .case{margin:30px;border:1px solid #ccc;padding:20px;}</style>')
-    html.append('</head><body>')
-    html.append(f'<h1>{condition} Detection - {plane} Plane - Top 20 Cases</h1>')
-    
-    for case in top_cases:
-        exam, label = dataset[case['idx']]
-        slice_idx = case['slice_idx']
-        
-        # Get original slice
-        original_slice = exam[slice_idx, 0, :, :].numpy()
-        
-        # Generate Grad-CAM heatmap
-        heatmap = get_gradcam_heatmap(model, exam.unsqueeze(0).to(device), slice_idx)
-        
-        # Create overlay
-        overlay = show_cam_on_image(
-            np.stack([original_slice]*3, axis=2), 
-            heatmap, 
-            use_rgb=True
-        )
-        
-        # Create figure with original and overlay
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-        ax1.imshow(original_slice, cmap='gray')
-        ax1.set_title('Original Slice')
-        ax1.axis('off')
-        ax2.imshow(overlay)
-        ax2.set_title('Grad-CAM Overlay')
-        ax2.axis('off')
-        
-        # Convert to base64
-        buf = BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight')
-        plt.close()
-        img_b64 = base64.b64encode(buf.getvalue()).decode()
-        
-        contribution_pct = (case['contribution'] / 256) * 100
-        
-        # Dynamic label text based on condition
-        label_text = f"Positive ({condition})" if case["true_label"] == 1 else f"Negative (No {condition})"
-        
-        # Add case to HTML
-        html.append('<div class="case">')
-        html.append(f'<h3>Case #{case["idx"]}</h3>')
-        html.append(f'<p><strong>Overall Confidence:</strong> {case["pred_prob"]:.3f} ({case["pred_prob"]*100:.1f}%)</p>')
-        html.append(f'<p><strong>True Label:</strong> {label_text}</p>')
-        html.append(f'<p><strong>Most Informative Slice:</strong> #{slice_idx}</p>')
-        html.append(f'<p><strong>Slice Contribution:</strong> {case["contribution"]}/256 features ({contribution_pct:.1f}%)</p>')
-        html.append(f'<img src="data:image/png;base64,{img_b64}" style="width:100%;max-width:800px;"/>')
-        html.append('</div>')
-    
-    html.append('</body></html>')
-    
-    with open(output_path, 'w') as f:
-        f.write('\n'.join(html))
-    
-    print(f"Triage report saved to {output_path}")
+    p = argparse.ArgumentParser()
+    p.add_argument('--checkpoint',     type=str, default=None,
+                   help='Single checkpoint .pth file (omit to run all)')
+    p.add_argument('--checkpoint_dir', type=str, default='checkpoints/',
+                   help='Directory of all checkpoints (used when --checkpoint is omitted)')
+    p.add_argument('--data_dir',       type=str, default='code/src/data/')
+    p.add_argument('--output_dir',     type=str, default='job_outputs/gradcam/')
+    p.add_argument('--data_mode',      type=str, default='cropped',
+                   choices=['cropped', 'uncropped'])
+    p.add_argument('--n_cases',        type=int, default=10,
+                   help='Number of cases to visualise per condition/plane')
+    return p.parse_args()
 
 
 def main():
-    args = parse_args()
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    print(f"Loading checkpoint: {args.checkpoint}")
-    
-    # Load checkpoint and extract metadata
-    checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
-    checkpoint_args = checkpoint['args']
-    
-    print(f"Condition: {checkpoint_args['condition']}, Plane: {checkpoint_args['plane']}")
-    print(f"Validation AUC: {checkpoint['val_auc']:.4f}")
-    
-    # Load model
-    model = create_baseline_model().to(device)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    model.eval()
-    
-    # Load validation dataset
-    val_dataset = ValidMRNetDataset(
-        root_dir=args.data_dir,
-        condition=checkpoint_args['condition'],
-        plane=checkpoint_args['plane'],
-        data_mode=args.data_mode,
-    )
-    
-    print(f"Loaded {len(val_dataset)} validation cases")
-    print("Generating Grad-CAM visualizations...")
-    
-    # Generate HTML report
-    generate_triage_html(model, val_dataset, device, checkpoint_args, args.output)
-    
-    print(f"\n Open {args.output} in a browser to view the report.")
+    args   = parse_args()
+    device = torch.device('cpu')
+    print(f"Device: {device} | Data mode: {args.data_mode} | Cases per model: {args.n_cases}")
+
+    if args.checkpoint:
+        run_single(args.checkpoint, args.data_dir, args.data_mode, args.n_cases, device)
+    else:
+        run_all(args.checkpoint_dir, args.data_dir, args.output_dir,
+                args.data_mode, args.n_cases, device)
 
 
 if __name__ == '__main__':

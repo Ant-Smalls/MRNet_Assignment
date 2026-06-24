@@ -52,7 +52,7 @@ class MRNetBaseModel(nn.Module):
         # Max pool and track which slice contributed each feature
         pooled, slice_indices = torch.max(features, dim=1)
         logits = self.fc(pooled)
-        return logits, slice_indices
+        return logits, slice_indices, pooled
     
     def freeze_backbone(self):
         """Freeze backbone parameters. Note: Not used for single-phase training."""

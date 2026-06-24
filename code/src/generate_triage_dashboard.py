@@ -293,7 +293,7 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
   </div>
   <div class="header-right">
     <span class="status-pill"><span class="status-dot"></span>Analysis Complete</span>
-    <span class="ucd-badge">Group 4, UCD</span>
+    <span class="ucd-badge">UCD 2026</span>
   </div>
 </div>
 
@@ -392,7 +392,7 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 </div>
 
 <div class="footer">
-  <span>MRNet Explainability <span>MRNet Explainability &amp; Clinical Triage Dashboard · University College Dublin</span>amp; Clinical Triage Dashboard · Group 4, UCD</span>
+  <span>MRNet Explainability &amp; Clinical Triage Dashboard · University College Dublin</span>
   <span id="footerDate"></span>
 </div>
 </div>
@@ -894,7 +894,7 @@ function initSig() {{
 let gcCond = 'acl', gcMode = 'both', gcArch = 'baseline';
 let gcInited = false;
 
-function initGradCam() {
+function initGradCam() {{
   if(!gcInited) {{
     gcInited = true;
     const condTabs = document.getElementById('gcCondTabs');
@@ -906,21 +906,21 @@ function initGradCam() {
       condTabs.appendChild(btn);
     }});
     const modeTabs = document.getElementById('gcModeTabs');
-    [{id:'both',label:'Both (Compare)'},{id:'cropped',label:'🟢 Cropped'},{id:'uncropped',label:'🟣 Uncropped'}].forEach((m,i) => {
+    [{{id:'both',label:'Both (Compare)'}},{{id:'cropped',label:'🟢 Cropped'}},{{id:'uncropped',label:'🟣 Uncropped'}}].forEach((m,i) => {{
       const btn = document.createElement('button');
       btn.className = 'cond-tab' + (i===0?' active':'');
       btn.textContent = m.label;
-      btn.onclick = () => { gcMode = m.id; setGcActive('gcModeTabs', btn); renderGradCam(); };
+      btn.onclick = () => {{ gcMode = m.id; setGcActive('gcModeTabs', btn); renderGradCam(); }};
       modeTabs.appendChild(btn);
-    });
+    }});
     const archTabs = document.getElementById('gcArchTabs');
-    [{id:'baseline',label:'AlexNet (Baseline)'},{id:'comparative',label:'DenseNet (Comparative)'}].forEach((a,i) => {
+    [{{id:'baseline',label:'AlexNet (Baseline)'}},{{id:'comparative',label:'DenseNet (Comparative)'}}].forEach((a,i) => {{
       const btn = document.createElement('button');
       btn.className = 'cond-tab' + (i===0?' active':'');
       btn.textContent = a.label;
-      btn.onclick = () => { gcArch = a.id; setGcActive('gcArchTabs', btn); renderGradCam(); };
+      btn.onclick = () => {{ gcArch = a.id; setGcActive('gcArchTabs', btn); renderGradCam(); }};
       archTabs.appendChild(btn);
-    });
+    }});
   }}
   renderGradCam();
 }}
@@ -941,11 +941,11 @@ function renderGradCam() {{
   const modes = gcMode === 'both' ? ['uncropped','cropped'] : [gcMode];
   
   let allIdxs = new Set();
-  modes.forEach(m => {
-    (GRADCAM_DATA[m]||[]).filter(e => e.condition === gcCond && e.architecture === gcArch).forEach(e => {
+  modes.forEach(m => {{
+    (GRADCAM_DATA[m]||[]).filter(e => e.condition === gcCond && e.architecture === gcArch).forEach(e => {{
        (e.cases||[]).forEach(c => allIdxs.add(c.idx));
-    });
-  });
+    }});
+  }});
   
   if(allIdxs.size === 0) {{
     grid.innerHTML = '<div class="card" style="text-align:center;padding:40px;color:var(--muted)">No data for this combination.</div>';
@@ -957,12 +957,12 @@ function renderGradCam() {{
 
   grid.innerHTML = Array.from(allIdxs).sort((a,b)=>a-b).map(idx => {{
     let true_label = 0;
-    modes.forEach(m => {
-      (GRADCAM_DATA[m]||[]).filter(e=>e.condition===gcCond && e.architecture===gcArch).forEach(e => {
+    modes.forEach(m => {{
+      (GRADCAM_DATA[m]||[]).filter(e=>e.condition===gcCond && e.architecture===gcArch).forEach(e => {{
         const cc = (e.cases||[]).find(c=>c.idx===idx);
         if(cc) true_label = cc.true_label;
-      });
-    });
+      }});
+    }});
     const gtHtml = true_label === 1
         ? '<span style="color:#15803d;font-weight:600">Positive</span>'
         : '<span style="color:#0891b2;font-weight:600">Negative</span>';
@@ -982,9 +982,9 @@ function renderGradCam() {{
         <div style="margin-bottom:12px"><span class="gc-mode-badge" style="background:${{mBg}};color:${{mTx}};border:1px solid ${{mBd}}">${{mIc}} ${{m.toUpperCase()}}</span></div>
         <div class="gc-grid-3">`;
       
-      ['axial','coronal','sagittal'].forEach(plane => {
+      ['axial','coronal','sagittal'].forEach(plane => {{
         const entry = (GRADCAM_DATA[m]||[]).find(e => e.condition === gcCond && e.plane === plane && e.architecture === gcArch);
-        const caseData = (entry?.cases||[]).find(c => c.idx === idx);
+        const caseData = entry ? (entry.cases||[]).find(c => c.idx === idx) : null;
         
         if(caseData) {{
           rowHtml += `<div>

@@ -5,13 +5,13 @@
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --time=08:00:00
-#SBATCH --job-name=comp_${CONDITION}_${PLANE}_${DATA_MODE}_${COMP_ARCH}
-#SBATCH --output=%x_%j.out
-#SBATCH --error=%x_%j.err
+#SBATCH --job-name=comparative
+#SBATCH --output=job_outputs/comparative_%j.out
+#SBATCH --error=job_outputs/comparative_%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=25205761@ucdconnect.ie
 
-PROJECT_DIR=$HOME/MRNet_Assignment
+cd $SLURM_SUBMIT_DIR
 
 echo "=========================================="
 echo "Job ID:    $SLURM_JOB_ID"
@@ -21,12 +21,19 @@ echo "Start:     $(date)"
 echo "Condition: $CONDITION | Plane: $PLANE | Data: $DATA_MODE | Arch: $COMP_ARCH"
 echo "=========================================="
 
-cd $PROJECT_DIR
+# Load python module
+module load python/3.10
 
-# Activate virtual environment
+# Create venv if it doesn't exist
+if [ ! -d "venv" ]; then
+    python -m venv venv
+fi
 source venv/bin/activate
 
-# Confirm GPU is available
+# Install dependencies (including torchxrayvision)
+pip install -r requirements.txt -q
+
+# Confirm GPU
 echo ""
 nvidia-smi
 echo ""
@@ -39,6 +46,8 @@ echo ""
 echo "=========================================="
 echo "Starting training at $(date)"
 echo "=========================================="
+
+mkdir -p checkpoints
 
 python3 -u code/src/train.py \
     --condition        $CONDITION \

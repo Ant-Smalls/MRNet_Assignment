@@ -43,7 +43,7 @@ def build_html(conditions_data, master_table, significance, gradcam_data=None):
     sig_js     = json.dumps(significance)
     gradcam_js = json.dumps(gradcam_data or {})
 
-    return f"""<!DOCTYPE html>
+    html_template = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -52,7 +52,6 @@ def build_html(conditions_data, master_table, significance, gradcam_data=None):
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-/* ── TOKENS ─────────────────────────────────────────────────────── */
 :root {{
   --bg:        #f8fafc;
   --surface:   #ffffff;
@@ -75,7 +74,6 @@ def build_html(conditions_data, master_table, significance, gradcam_data=None):
   --radius:    12px;
 }}
 
-/* ── RESET ──────────────────────────────────────────────────────── */
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{
   font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -83,10 +81,8 @@ body{{
   -webkit-font-smoothing:antialiased;
 }}
 
-/* ── LAYOUT ─────────────────────────────────────────────────────── */
 .wrapper{{max-width:1440px;margin:0 auto;padding:28px 24px 60px}}
 
-/* ── HEADER ─────────────────────────────────────────────────────── */
 .header{{
   display:flex;align-items:flex-start;justify-content:space-between;
   gap:16px;flex-wrap:wrap;
@@ -121,7 +117,6 @@ body{{
   background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;
 }}
 
-/* ── TABS ────────────────────────────────────────────────────────── */
 .tab-bar{{
   display:flex;gap:2px;margin-bottom:24px;
   border-bottom:2px solid var(--border);
@@ -136,10 +131,8 @@ body{{
 .tab:hover:not(.active){{color:var(--text2);background:#f1f5f9}}
 .tab.active{{color:var(--accent);border-bottom-color:var(--accent)}}
 
-/* ── SECTIONS ────────────────────────────────────────────────────── */
 .section{{display:none}}.section.active{{display:block}}
 
-/* ── KPI GRID ────────────────────────────────────────────────────── */
 .kpi-grid{{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
   gap:14px;margin-bottom:22px;
@@ -162,7 +155,6 @@ body{{
 .kpi-value{{font-size:1.8rem;font-weight:800;letter-spacing:-1px;color:var(--text)}}
 .kpi-sub{{font-size:.72rem;color:var(--muted2);margin-top:5px}}
 
-/* ── CARDS ───────────────────────────────────────────────────────── */
 .card{{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius);padding:22px 24px;
@@ -174,18 +166,15 @@ body{{
   display:flex;align-items:center;gap:8px;
 }}
 
-/* ── CHART GRID ──────────────────────────────────────────────────── */
 .chart-grid{{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}}
 @media(max-width:780px){{.chart-grid{{grid-template-columns:1fr}}}}
 
-/* ── SVG CHARTS ──────────────────────────────────────────────────── */
 .svg-chart{{width:100%;overflow:visible}}
 .chart-axis-label{{font-size:10px;fill:#94a3b8;font-family:inherit}}
 .chart-tick{{font-size:10px;fill:#64748b;font-family:inherit}}
 .chart-bar{{rx:4;transition:opacity .15s}}
 .chart-bar:hover{{opacity:.85;cursor:default}}
 
-/* ── MASTER TABLE ────────────────────────────────────────────────── */
 .table-wrap{{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}}
 table{{width:100%;border-collapse:collapse;font-size:.82rem}}
 thead th{{
@@ -203,7 +192,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
   font-size:.72rem;font-weight:700;
 }}
 
-/* ── CONDITION TABS ──────────────────────────────────────────────── */
 .cond-tabs{{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}}
 .cond-tab{{
   padding:7px 16px;border-radius:999px;
@@ -214,7 +202,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 .cond-tab.active{{border-color:var(--accent);color:var(--accent);background:#eff6ff}}
 .cond-tab:hover:not(.active){{border-color:var(--border2);color:var(--text2)}}
 
-/* ── TRIAGE LIST ─────────────────────────────────────────────────── */
 .triage-headers{{
   display:grid;grid-template-columns:80px 1fr 210px 90px;
   gap:12px;padding:0 12px 8px;
@@ -247,7 +234,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 }}
 .filter-btn.active{{border-color:var(--accent);color:var(--accent);background:#eff6ff}}
 
-/* ── COMPARISON BARS ─────────────────────────────────────────────── */
 .comp-item{{margin-bottom:18px}}
 .comp-label{{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px}}
 .two-bars{{display:grid;grid-template-columns:1fr 1fr;gap:8px}}
@@ -255,7 +241,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 .h-bar-track{{background:#f1f5f9;border-radius:999px;height:9px;overflow:hidden}}
 .h-bar-fill{{height:100%;border-radius:999px;transition:width .4s ease}}
 
-/* ── SIG CARDS ───────────────────────────────────────────────────── */
 .sig-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}}
 .sig-card{{
   background:var(--card);border:1px solid var(--border);
@@ -273,12 +258,10 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 .sig-row:last-child{{border-bottom:none}}
 .sig-val{{font-weight:700}}
 
-/* ── SCROLLBAR ───────────────────────────────────────────────────── */
 ::-webkit-scrollbar{{width:5px;height:5px}}
 ::-webkit-scrollbar-track{{background:#f1f5f9}}
 ::-webkit-scrollbar-thumb{{background:#cbd5e1;border-radius:99px}}
 
-/* ── GRAD-CAM ────────────────────────────────────────────────────── */
 .gc-filter-label{{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted2);margin-bottom:6px}}
 .gc-card{{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);margin-bottom:16px}}
 .gc-card-header{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px}}
@@ -289,7 +272,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 .gc-grid-3{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}}
 @media(max-width:900px){{.gc-grid-3{{grid-template-columns:1fr}}}}
 
-/* ── FOOTER ──────────────────────────────────────────────────────── */
 .footer{{
   margin-top:40px;padding-top:16px;border-top:1px solid var(--border);
   font-size:.72rem;color:var(--muted2);
@@ -306,12 +288,12 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
     <div class="logo-mark">🏥</div>
     <div class="header-title">
       <h1>MRNet Explainability &amp; Clinical Triage Dashboard</h1>
-      <p>Knee MRI · AlexNet-ImageNet Baseline · Semantic R-CNN Cropping · University College Dublin</p>
+      <p>Knee MRI · AlexNet-ImageNet Baseline · DenseNet Comparative · Semantic R-CNN Cropping</p>
     </div>
   </div>
   <div class="header-right">
     <span class="status-pill"><span class="status-dot"></span>Analysis Complete</span>
-    <span class="ucd-badge">UCD 2025</span>
+    <span class="ucd-badge">Group 4, UCD</span>
   </div>
 </div>
 
@@ -324,7 +306,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
   <button class="tab" onclick="showTab('gradcam')">🔬 Grad-CAM</button>
 </div>
 
-<!-- ═══════ OVERVIEW ═══════ -->
 <div id="tab-overview" class="section active">
   <div class="kpi-grid" id="kpiGrid"></div>
   <div class="chart-grid">
@@ -343,7 +324,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
   </div>
 </div>
 
-<!-- ═══════ TRIAGE ═══════ -->
 <div id="tab-triage" class="section">
   <div class="cond-tabs" id="condTabsTriage"></div>
   <div class="card">
@@ -371,13 +351,11 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
   </div>
 </div>
 
-<!-- ═══════ PERFORMANCE ═══════ -->
 <div id="tab-performance" class="section">
   <div class="cond-tabs" id="condTabsPerf"></div>
   <div id="perfContent"></div>
 </div>
 
-<!-- ═══════ STATISTICS ═══════ -->
 <div id="tab-significance" class="section">
   <div class="card" style="margin-bottom:18px">
     <p style="font-size:.82rem;color:var(--muted);line-height:1.7">
@@ -388,7 +366,6 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
   <div class="sig-grid" id="sigGrid"></div>
 </div>
 
-<!-- ═══════ GRAD-CAM ═══════ -->
 <div id="tab-gradcam" class="section">
   <div class="card" style="margin-bottom:16px">
     <p style="font-size:.82rem;color:var(--muted);line-height:1.8">
@@ -415,7 +392,7 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 </div>
 
 <div class="footer">
-  <span>MRNet Explainability &amp; Clinical Triage Dashboard · University College Dublin</span>
+  <span>MRNet Explainability <span>MRNet Explainability &amp; Clinical Triage Dashboard · University College Dublin</span>amp; Clinical Triage Dashboard · Group 4, UCD</span>
   <span id="footerDate"></span>
 </div>
 </div>
@@ -468,7 +445,6 @@ function aucBadge(v) {{
   return {{bg:'#fffbeb',text:'#d97706'}};
 }}
 
-/* ── TAB ROUTING ──────────────────────────────────────────────────── */
 function showTab(id) {{
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -481,7 +457,6 @@ function showTab(id) {{
   if(id === 'gradcam')     initGradCam();
 }}
 
-/* ── SVG CHARTS ───────────────────────────────────────────────────── */
 function svgBar(items, opts) {{
   const W = opts.width || 520;
   const H = opts.height || 200;
@@ -547,7 +522,6 @@ function svgBar(items, opts) {{
   return s;
 }}
 
-/* ── OVERVIEW ─────────────────────────────────────────────────────── */
 (function buildOverview() {{
   const conds = ['acl','meniscus','abnormal'];
   const cropped   = MASTER_TABLE.filter(r => r.data_mode === 'cropped');
@@ -634,7 +608,6 @@ function svgBar(items, opts) {{
   document.getElementById('masterTable').innerHTML = html;
 }})();
 
-/* ── TRIAGE ───────────────────────────────────────────────────────── */
 let triageInited = false;
 let curCond = 'acl', curFilter = 'all';
 
@@ -715,7 +688,6 @@ function renderTriage() {{
   }}).join('');
 }}
 
-/* ── PERFORMANCE ──────────────────────────────────────────────────── */
 let perfInited = false;
 let curPerfCond = 'acl';
 
@@ -870,7 +842,6 @@ function renderPerf() {{
   </div>`;
 }}
 
-/* ── SIGNIFICANCE ─────────────────────────────────────────────────── */
 function initSig() {{
   const grid = document.getElementById('sigGrid');
   if(grid.childElementCount > 0) return;
@@ -920,7 +891,6 @@ function initSig() {{
 }}
 
 
-/* ── GRAD-CAM ─────────────────────────────────────────────────────── */
 let gcCond = 'acl', gcMode = 'both', gcArch = 'baseline';
 let gcInited = false;
 
@@ -1053,6 +1023,16 @@ document.getElementById('footerDate').textContent =
 </script>
 </body>
 </html>"""
+    
+    # Fix double braces back to single braces (from the old f-string)
+    html_template = html_template.replace('{{', '{').replace('}}', '}')
+    # Inject the JSON payloads
+    html_template = html_template.replace('{cdata_js}', cdata_js)
+    html_template = html_template.replace('{master_js}', master_js)
+    html_template = html_template.replace('{sig_js}', sig_js)
+    html_template = html_template.replace('{gradcam_js}', gradcam_js)
+    
+    return html_template
 
 
 def main():

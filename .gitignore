@@ -26,3 +26,5 @@ __pycache__/
 
 # Cursor 
 .cursor/
+# Output data
+job_outputs/

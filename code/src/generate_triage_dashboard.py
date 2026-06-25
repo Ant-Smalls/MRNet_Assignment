@@ -392,7 +392,7 @@ tbody td{{padding:10px 16px;white-space:nowrap;color:var(--text2)}}
 </div>
 
 <div class="footer">
-  <span>MRNet Explainability &amp; Clinical Triage Dashboard · University College Dublin</span>
+  <span>MRNet Explainability <span>MRNet Explainability &amp; Clinical Triage Dashboard · University College Dublin</span>amp; Clinical Triage Dashboard · Group 4, UCD</span>
   <span id="footerDate"></span>
 </div>
 </div>

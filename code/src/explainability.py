@@ -34,6 +34,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.stats import mode
+from tqdm import tqdm
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
@@ -257,7 +258,7 @@ def process_checkpoint(ckpt_dir, data_dir, data_mode, n_cases, device):
 
     print(f"    Generating Grad-CAM for {len(selected)} cases…")
     cases_out = []
-    for case in selected:
+    for case in tqdm(selected, desc=f"  {condition}-{plane}", leave=False):
         exam, _ = dataset[case['idx']]
         s_idx   = case['slice_idx']
         heatmap = gradcam_for_slice(

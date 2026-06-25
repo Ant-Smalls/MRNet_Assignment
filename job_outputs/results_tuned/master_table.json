@@ -1,0 +1,74 @@
+[
+  {
+    "condition": "acl",
+    "architecture": "baseline",
+    "data_mode": "uncropped",
+    "threshold": 0.4898,
+    "auc": 0.9226,
+    "auc_ci_low": 0.8698,
+    "auc_ci_high": 0.9621,
+    "sensitivity": 0.7037,
+    "specificity": 0.8939,
+    "f1": 0.7677
+  },
+  {
+    "condition": "acl",
+    "architecture": "baseline",
+    "data_mode": "cropped",
+    "threshold": 0.3307,
+    "auc": 0.945,
+    "auc_ci_low": 0.8991,
+    "auc_ci_high": 0.9786,
+    "sensitivity": 0.9444,
+    "specificity": 0.803,
+    "f1": 0.8644
+  },
+  {
+    "condition": "meniscus",
+    "architecture": "baseline",
+    "data_mode": "uncropped",
+    "threshold": 0.3855,
+    "auc": 0.806,
+    "auc_ci_low": 0.7191,
+    "auc_ci_high": 0.881,
+    "sensitivity": 0.9038,
+    "specificity": 0.5294,
+    "f1": 0.7176
+  },
+  {
+    "condition": "meniscus",
+    "architecture": "baseline",
+    "data_mode": "cropped",
+    "threshold": 0.4789,
+    "auc": 0.8224,
+    "auc_ci_low": 0.7391,
+    "auc_ci_high": 0.8917,
+    "sensitivity": 0.9423,
+    "specificity": 0.3971,
+    "f1": 0.6901
+  },
+  {
+    "condition": "abnormal",
+    "architecture": "baseline",
+    "data_mode": "uncropped",
+    "threshold": 0.6283,
+    "auc": 0.8749,
+    "auc_ci_low": 0.8028,
+    "auc_ci_high": 0.9365,
+    "sensitivity": 0.8947,
+    "specificity": 0.6,
+    "f1": 0.8947
+  },
+  {
+    "condition": "abnormal",
+    "architecture": "baseline",
+    "data_mode": "cropped",
+    "threshold": 0.6194,
+    "auc": 0.9011,
+    "auc_ci_low": 0.8328,
+    "auc_ci_high": 0.9542,
+    "sensitivity": 0.9158,
+    "specificity": 0.6,
+    "f1": 0.9062
+  }
+]

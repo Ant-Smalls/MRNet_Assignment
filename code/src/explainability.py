@@ -41,6 +41,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent))
 from modules.data_preprocessing_transformation import ValidMRNetDataset
 from modules.baseline_models import create_baseline_model
+from modules.comparative_models import create_comparative_model
 
 
 # ── GradCAM wrapper ─────────────────────────────────────────────────────────
@@ -77,7 +78,14 @@ def gradcam_for_slice(model, slice_tensor, device):
       12 MaxPool2d
     """
     wrapped = SliceWrapper(model).to(device)
-    target_layer = [wrapped.backbone[10]]
+    
+    if hasattr(wrapped.backbone, 'features'):
+        # DenseNet (XRVBackbone)
+        target_layer = [wrapped.backbone.features[-1]]
+    else:
+        # AlexNet (Sequential)
+        target_layer = [wrapped.backbone[10]]
+        
     cam = GradCAM(model=wrapped, target_layers=target_layer)
     grayscale = cam(input_tensor=slice_tensor.unsqueeze(0).to(device))
     return grayscale[0]
@@ -204,13 +212,18 @@ def process_checkpoint(ckpt_dir, data_dir, data_mode, n_cases, device):
     condition = cfg['condition']
     plane     = cfg['plane']
     ckpt_data_mode = cfg.get('data_mode', data_mode)
+    architecture = cfg.get('architecture', 'baseline')
+    comparative_arch = cfg.get('comparative_arch', 'xrv_dense')
 
     if ckpt_data_mode != data_mode:
         return None
 
-    print(f"  Processing: {condition} / {plane} / {ckpt_data_mode}")
+    print(f"  Processing: {condition} / {plane} / {architecture} / {ckpt_data_mode}")
 
-    model = create_baseline_model().to(device)
+    if architecture == 'baseline':
+        model = create_baseline_model().to(device)
+    else:
+        model = create_comparative_model(architecture=comparative_arch).to(device)
     ckpt  = torch.load(ckpt_path, map_location=device, weights_only=False)
     state = ckpt.get('model_state_dict', ckpt)
     model.load_state_dict(state)
@@ -273,6 +286,8 @@ def process_checkpoint(ckpt_dir, data_dir, data_mode, n_cases, device):
         'condition': condition,
         'plane': plane,
         'data_mode': data_mode,
+        'architecture': architecture,
+        'comparative_arch': comparative_arch if architecture != 'baseline' else None,
         'val_auc': float(ckpt.get('val_auc', 0)),
         'n_total': len(dataset),
         'cases': cases_out,

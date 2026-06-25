@@ -114,7 +114,7 @@ def most_informative_slice(model, exam_tensor, device):
 def run_inference(model, dataset, device):
     """Return list of dicts with pred_prob, true_label, slice_idx per patient."""
     results = []
-    for i in range(len(dataset)):
+    for i in tqdm(range(len(dataset)), desc="    Inference", leave=False):
         exam, label = dataset[i]
         exam_t = exam.unsqueeze(0).to(device)
         with torch.no_grad():

@@ -9,10 +9,10 @@ class MRNetBaseModel(nn.Module):
     Architecture: AlexNet features -> Global Avg Pool -> Max pool slices -> FC(256->1)
     Modeling after original MRNet architecture from the paper."""
     
-    def __init__(self, backbone):
+    def __init__(self, backbone, feature_dim=256):
         super().__init__()
         self.backbone = backbone
-        self.fc = nn.Linear(256, 1)
+        self.fc = nn.Linear(feature_dim, 1)
     
     def forward(self, x):
         """Args: x (batch_size, num_slices, 3, H, W)

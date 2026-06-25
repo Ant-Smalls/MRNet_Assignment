@@ -894,7 +894,7 @@ function initSig() {{
 let gcCond = 'acl', gcMode = 'both', gcArch = 'baseline';
 let gcInited = false;
 
-function initGradCam() {{
+function initGradCam() {
   if(!gcInited) {{
     gcInited = true;
     const condTabs = document.getElementById('gcCondTabs');

@@ -7,6 +7,7 @@ code/src/data/mrnet_cropped/
 
 # Model checkpoints (too large for git)
 checkpoints/
+all_checkpoints/
 
 # TensorBoard logs
 runs/

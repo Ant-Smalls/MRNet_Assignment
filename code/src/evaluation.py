@@ -72,9 +72,9 @@ def find_checkpoint(model_dir):
     return hits[0] if hits else None
 
 
-def load_single_model(condition, plane, architecture, data_mode, checkpoint_dir, device, args):
+def load_single_model(condition, plane, architecture, data_mode, checkpoint_dir, device, comparative_arch):
     """Load one trained plane model, or return None if its checkpoint isn't available yet."""
-    arch_label = architecture if architecture == 'baseline' else f"comparative_{args.comparative_arch}"
+    arch_label = architecture if architecture == 'baseline' else f"comparative_{comparative_arch}"
     model_name = f"{condition}_{plane}_{arch_label}_{data_mode}"
     model_dir = Path(checkpoint_dir) / model_name
     ckpt_path = find_checkpoint(model_dir)
@@ -84,7 +84,7 @@ def load_single_model(condition, plane, architecture, data_mode, checkpoint_dir,
     if architecture == 'baseline':
         model = create_baseline_model()
     else:
-        model = create_comparative_model(architecture=args.comparative_arch)
+        model = create_comparative_model(architecture=comparative_arch)
 
     checkpoint = torch.load(ckpt_path, map_location=device, weights_only=False)
     state = checkpoint['model_state_dict'] if 'model_state_dict' in checkpoint else checkpoint # to accpet either a full checkpoint dict or an empty state_dict
@@ -277,7 +277,7 @@ def evaluate_mode(condition, architecture, data_mode, args, device):
     plane_results = {}
     val_plane_results = {}   # val predictions which are only collected if we are tuning
     for plane in PLANES:
-        model = load_single_model(condition, plane, architecture, data_mode, args.checkpoint_dir, device)
+        model = load_single_model(condition, plane, architecture, data_mode, args.checkpoint_dir, device, args.comparative_arch)
         if model is None:
             continue
         dataset = ValidMRNetDataset(args.data_dir, condition, plane, data_mode)

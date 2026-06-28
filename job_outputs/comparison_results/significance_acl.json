@@ -1,0 +1,9 @@
+{
+  "pretraining_effect_uncropped": {
+    "auc_diff_b_minus_a": -0.10774410774410781,
+    "ci_low": -0.1870099817264043,
+    "ci_high": -0.03479450062751153,
+    "p_two_sided": 0.004,
+    "significant_at_0.05": true
+  }
+}

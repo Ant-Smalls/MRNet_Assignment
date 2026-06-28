@@ -34,6 +34,8 @@ def parse_args():
     parser.add_argument('--condition',       type=str,   required=True, choices=['acl', 'meniscus', 'abnormal'])
     parser.add_argument('--plane',           type=str,   required=True, choices=['axial', 'coronal', 'sagittal'])
     parser.add_argument('--architecture',    type=str,   default='baseline', choices=['baseline', 'comparative'])
+    parser.add_argument('--comparative_arch', type=str,  default='xrv_dense', choices=['resnet50', 'xrv_dense'],
+                        help='Backbone for comparative model: resnet50 (ImageNet) or xrv_dense (DenseNet121 pretrained on chest X-rays)')
     parser.add_argument('--data_mode',       type=str,   required=True, choices=['uncropped', 'cropped'])
     parser.add_argument('--training_mode',   type=str,   default='two-phase', choices=['single-phase', 'two-phase'],
                         help='Training strategy: single-phase (all layers) or two-phase (frozen then full)')
@@ -118,8 +120,7 @@ def create_model(args):
         print("Architecture: AlexNet (ImageNet weights)")
         return create_baseline_model()
     else:
-        print("Architecture: ResNet50 (RadImageNet weights)")
-        return create_comparative_model()
+        return create_comparative_model(architecture=args.comparative_arch)
 
 
 # ---------------------------------------------------------------------------
@@ -301,7 +302,8 @@ def train_phase(model, train_loader, val_loader, optimizer, criterion,
 def main():
     args       = parse_args()
     #creates a unique model and folder name based on the training parameters
-    model_name = f"{args.condition}_{args.plane}_{args.architecture}_{args.data_mode}"
+    arch_label = args.architecture if args.architecture == 'baseline' else f"comparative_{args.comparative_arch}"
+    model_name = f"{args.condition}_{args.plane}_{arch_label}_{args.data_mode}"
     checkpoint_dir = os.path.join(args.checkpoint_dir, model_name)
     os.makedirs(checkpoint_dir, exist_ok=True)
 

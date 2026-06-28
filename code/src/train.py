@@ -165,6 +165,8 @@ def train_epoch(model, dataloader, optimizer, criterion, device):
         logits = model(exam).squeeze(1)   # (1,) → scalar-ish
         loss   = criterion(logits, label)
         loss.backward()
+        # Clip gradients to prevent explosion (especially important for SGD with batch_size=1)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
 
         total_loss += loss.item()

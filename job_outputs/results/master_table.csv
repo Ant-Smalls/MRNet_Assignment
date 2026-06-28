@@ -1,7 +1,0 @@
-condition,architecture,data_mode,threshold,auc,auc_ci_low,auc_ci_high,sensitivity,specificity,f1
-acl,baseline,uncropped,0.5,0.9226,0.8698,0.9621,0.7037,0.9242,0.7835
-acl,baseline,cropped,0.5,0.945,0.8991,0.9786,0.8519,0.8939,0.8598
-meniscus,baseline,uncropped,0.5,0.806,0.7191,0.881,0.8462,0.6324,0.7273
-meniscus,baseline,cropped,0.5,0.8224,0.7391,0.8917,0.9423,0.4412,0.705
-abnormal,baseline,uncropped,0.5,0.8749,0.8028,0.9365,0.9474,0.44,0.9045
-abnormal,baseline,cropped,0.5,0.9011,0.8328,0.9542,0.9684,0.44,0.9154

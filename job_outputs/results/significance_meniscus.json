@@ -1,9 +1,0 @@
-{
-  "cropping_effect_baseline": {
-    "auc_diff_b_minus_a": 0.01640271493212664,
-    "ci_low": -0.041128966018961856,
-    "ci_high": 0.07581314273961326,
-    "p_two_sided": 0.65,
-    "significant_at_0.05": false
-  }
-}

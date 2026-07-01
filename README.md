@@ -15,7 +15,7 @@ This project implements and extends the MRNet architecture for automated detecti
 - **Novel R-CNN Preprocessing**: Automated knee joint space detection and cropping using Faster R-CNN
 - **Multi-Plane Fusion**: Combines predictions from axial, coronal, and sagittal views
 - **Explainability**: Grad-CAM visualizations on most informative slices
-- **Clinical Triage Dashboard**: Interactive HTML interface for radiologist review prioritization
+- **Clinical Triage Dashboard**: Interactive HTML interface for radiologist review prioritization (https://mrnet.jinish-rajan.workers.dev) 
 - **2×2 Experimental Design**: Systematic comparison of architectures × preprocessing methods
 
 ## Project Structure

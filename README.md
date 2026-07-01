@@ -238,6 +238,8 @@ The triage dashboard simulates a real-world radiologist workflow:
 3. **Confidence Calibration**: Threshold tuning for sensitivity/specificity trade-offs
 4. **Case Filtering**: Focus on TP/FP/TN/FN for model validation
 
+Check it out at this link: https://mrnet.jinish-rajan.workers.dev 
+
 ## Citation
 
 Relevant citations for this work include:

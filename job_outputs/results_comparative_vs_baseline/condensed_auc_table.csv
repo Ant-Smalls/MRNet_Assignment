@@ -1,0 +1,4 @@
+,AlexNet uncropped,AlexNet cropped,DenseNet uncropped,DenseNet cropped
+ACL,0.923,0.945,0.815,0.829
+Meniscus,0.806,0.822,0.758,0.788
+Abnormal,0.875,0.901,0.814,0.824

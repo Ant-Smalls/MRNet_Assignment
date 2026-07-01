@@ -1,0 +1,30 @@
+{
+  "cropping_effect_baseline": {
+    "auc_diff_b_minus_a": 0.01640271493212664,
+    "ci_low": -0.041128966018961856,
+    "ci_high": 0.07581314273961326,
+    "p_two_sided": 0.65,
+    "significant_at_0.05": false
+  },
+  "cropping_effect_comparative": {
+    "auc_diff_b_minus_a": 0.029977375565610753,
+    "ci_low": -0.06934125874125856,
+    "ci_high": 0.12840477952814552,
+    "p_two_sided": 0.578,
+    "significant_at_0.05": false
+  },
+  "pretraining_effect_uncropped": {
+    "auc_diff_b_minus_a": -0.04751131221719451,
+    "ci_low": -0.1504541402049161,
+    "ci_high": 0.04652163177039825,
+    "p_two_sided": 0.308,
+    "significant_at_0.05": false
+  },
+  "pretraining_effect_cropped": {
+    "auc_diff_b_minus_a": -0.0339366515837104,
+    "ci_low": -0.10446047349128866,
+    "ci_high": 0.03945797563875316,
+    "p_two_sided": 0.362,
+    "significant_at_0.05": false
+  }
+}

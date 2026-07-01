@@ -1,0 +1,1208 @@
+{
+  "condition": "acl",
+  "architecture": "baseline",
+  "data_mode": "cropped",
+  "threshold": 0.3306737045447032,
+  "cases": [
+    {
+      "patient_id": 1207,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999997615814209,
+        "coronal": 0.9860270023345947,
+        "sagittal": 0.9949323534965515
+      },
+      "fused_prob": 0.9936530391375223
+    },
+    {
+      "patient_id": 1199,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9955911636352539,
+        "coronal": 0.9673395752906799,
+        "sagittal": 0.9999433755874634
+      },
+      "fused_prob": 0.9876247048377991
+    },
+    {
+      "patient_id": 1198,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999939203262329,
+        "coronal": 0.9606620073318481,
+        "sagittal": 0.9992908239364624
+      },
+      "fused_prob": 0.9866489171981812
+    },
+    {
+      "patient_id": 1182,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9994926452636719,
+        "coronal": 0.9487900733947754,
+        "sagittal": 0.9991123080253601
+      },
+      "fused_prob": 0.9824650088946024
+    },
+    {
+      "patient_id": 1203,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999871253967285,
+        "coronal": 0.9605063199996948,
+        "sagittal": 0.9860937595367432
+      },
+      "fused_prob": 0.9821957349777222
+    },
+    {
+      "patient_id": 1188,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999996423721313,
+        "coronal": 0.9637155532836914,
+        "sagittal": 0.9716602563858032
+      },
+      "fused_prob": 0.9784584840138754
+    },
+    {
+      "patient_id": 1202,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9967562556266785,
+        "coronal": 0.9490007758140564,
+        "sagittal": 0.9818427562713623
+      },
+      "fused_prob": 0.9758665959040324
+    },
+    {
+      "patient_id": 1220,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999148845672607,
+        "coronal": 0.9182841181755066,
+        "sagittal": 0.9954661130905151
+      },
+      "fused_prob": 0.9712217052777609
+    },
+    {
+      "patient_id": 1209,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9981422424316406,
+        "coronal": 0.9081453084945679,
+        "sagittal": 0.9982874989509583
+      },
+      "fused_prob": 0.9681916832923889
+    },
+    {
+      "patient_id": 1174,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9858763813972473,
+        "coronal": 0.9299891591072083,
+        "sagittal": 0.987165093421936
+      },
+      "fused_prob": 0.9676768779754639
+    },
+    {
+      "patient_id": 1185,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999788999557495,
+        "coronal": 0.9036371111869812,
+        "sagittal": 0.9950541257858276
+      },
+      "fused_prob": 0.9662233789761862
+    },
+    {
+      "patient_id": 1204,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9993415474891663,
+        "coronal": 0.9490582346916199,
+        "sagittal": 0.9498869180679321
+      },
+      "fused_prob": 0.9660955667495728
+    },
+    {
+      "patient_id": 1179,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9993104934692383,
+        "coronal": 0.9124627709388733,
+        "sagittal": 0.9841572642326355
+      },
+      "fused_prob": 0.9653101762135824
+    },
+    {
+      "patient_id": 1213,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999972581863403,
+        "coronal": 0.8926804065704346,
+        "sagittal": 0.999613344669342
+      },
+      "fused_prob": 0.9640970031420389
+    },
+    {
+      "patient_id": 1190,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9994860887527466,
+        "coronal": 0.8880403637886047,
+        "sagittal": 0.9958511590957642
+      },
+      "fused_prob": 0.9611258705457052
+    },
+    {
+      "patient_id": 1201,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9719099402427673,
+        "coronal": 0.9256327748298645,
+        "sagittal": 0.978070080280304
+      },
+      "fused_prob": 0.9585375984509786
+    },
+    {
+      "patient_id": 1176,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999918937683105,
+        "coronal": 0.8531792163848877,
+        "sagittal": 0.9857810139656067
+      },
+      "fused_prob": 0.9463173747062683
+    },
+    {
+      "patient_id": 1184,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9087215662002563,
+        "coronal": 0.9730746746063232,
+        "sagittal": 0.9499087333679199
+      },
+      "fused_prob": 0.9439016580581665
+    },
+    {
+      "patient_id": 1225,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9848291277885437,
+        "coronal": 0.8439735770225525,
+        "sagittal": 0.9975805282592773
+      },
+      "fused_prob": 0.9421277443567911
+    },
+    {
+      "patient_id": 1172,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9843414425849915,
+        "coronal": 0.9001963138580322,
+        "sagittal": 0.9294111728668213
+      },
+      "fused_prob": 0.937982976436615
+    },
+    {
+      "patient_id": 1224,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999934434890747,
+        "coronal": 0.9640217423439026,
+        "sagittal": 0.8495936989784241
+      },
+      "fused_prob": 0.9378696282704672
+    },
+    {
+      "patient_id": 1200,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999806880950928,
+        "coronal": 0.936180591583252,
+        "sagittal": 0.8362101912498474
+      },
+      "fused_prob": 0.9241238236427307
+    },
+    {
+      "patient_id": 1191,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9983245730400085,
+        "coronal": 0.9613651633262634,
+        "sagittal": 0.8043379783630371
+      },
+      "fused_prob": 0.9213425715764364
+    },
+    {
+      "patient_id": 1206,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.8015315532684326,
+        "coronal": 0.9530847668647766,
+        "sagittal": 0.9984619617462158
+      },
+      "fused_prob": 0.917692760626475
+    },
+    {
+      "patient_id": 1193,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9976240992546082,
+        "coronal": 0.8641424775123596,
+        "sagittal": 0.8631325960159302
+      },
+      "fused_prob": 0.908299724260966
+    },
+    {
+      "patient_id": 1189,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.9743196964263916,
+        "coronal": 0.7984322905540466,
+        "sagittal": 0.9447253942489624
+      },
+      "fused_prob": 0.9058257937431335
+    },
+    {
+      "patient_id": 1215,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9999688863754272,
+        "coronal": 0.6966632008552551,
+        "sagittal": 0.9939913153648376
+      },
+      "fused_prob": 0.89687446753184
+    },
+    {
+      "patient_id": 1175,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9997609257698059,
+        "coronal": 0.6446943879127502,
+        "sagittal": 0.9980930685997009
+      },
+      "fused_prob": 0.8808494607607523
+    },
+    {
+      "patient_id": 1196,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9876357913017273,
+        "coronal": 0.8305271863937378,
+        "sagittal": 0.8236134648323059
+      },
+      "fused_prob": 0.880592147509257
+    },
+    {
+      "patient_id": 1205,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9113370776176453,
+        "coronal": 0.7952439785003662,
+        "sagittal": 0.9254403710365295
+      },
+      "fused_prob": 0.8773404757181803
+    },
+    {
+      "patient_id": 1197,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9983336329460144,
+        "coronal": 0.8349866271018982,
+        "sagittal": 0.7710211277008057
+      },
+      "fused_prob": 0.8681137959162394
+    },
+    {
+      "patient_id": 1229,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.965080738067627,
+        "coronal": 0.7413513660430908,
+        "sagittal": 0.8376101851463318
+      },
+      "fused_prob": 0.8480140964190165
+    },
+    {
+      "patient_id": 1214,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.8278598785400391,
+        "coronal": 0.8109397888183594,
+        "sagittal": 0.9009710550308228
+      },
+      "fused_prob": 0.8465902407964071
+    },
+    {
+      "patient_id": 1162,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.9903929829597473,
+        "coronal": 0.5167152285575867,
+        "sagittal": 0.9721259474754333
+      },
+      "fused_prob": 0.8264113863309225
+    },
+    {
+      "patient_id": 1210,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.4446394145488739,
+        "coronal": 0.9522226452827454,
+        "sagittal": 0.8943150639533997
+      },
+      "fused_prob": 0.7637257079283396
+    },
+    {
+      "patient_id": 1177,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.7024162411689758,
+        "coronal": 0.7051365971565247,
+        "sagittal": 0.8374960422515869
+      },
+      "fused_prob": 0.7483496268590292
+    },
+    {
+      "patient_id": 1223,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.9772615432739258,
+        "coronal": 0.9084886312484741,
+        "sagittal": 0.26460832357406616
+      },
+      "fused_prob": 0.7167861660321554
+    },
+    {
+      "patient_id": 1227,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.9907110333442688,
+        "coronal": 0.7725750803947449,
+        "sagittal": 0.3640400469303131
+      },
+      "fused_prob": 0.7091087202231089
+    },
+    {
+      "patient_id": 1186,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.30157244205474854,
+        "coronal": 0.7998703718185425,
+        "sagittal": 0.9973044395446777
+      },
+      "fused_prob": 0.6995824178059896
+    },
+    {
+      "patient_id": 1248,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.6001802682876587,
+        "coronal": 0.5065039396286011,
+        "sagittal": 0.9759398698806763
+      },
+      "fused_prob": 0.694208025932312
+    },
+    {
+      "patient_id": 1208,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.9924848675727844,
+        "coronal": 0.6890967488288879,
+        "sagittal": 0.25013741850852966
+      },
+      "fused_prob": 0.6439063449700674
+    },
+    {
+      "patient_id": 1246,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.3111035227775574,
+        "coronal": 0.93390953540802,
+        "sagittal": 0.6811003088951111
+      },
+      "fused_prob": 0.6420377890268961
+    },
+    {
+      "patient_id": 1219,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.1558961421251297,
+        "coronal": 0.9027794003486633,
+        "sagittal": 0.8242062330245972
+      },
+      "fused_prob": 0.6276272584994634
+    },
+    {
+      "patient_id": 1245,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.06657407432794571,
+        "coronal": 0.70570307970047,
+        "sagittal": 0.9708366394042969
+      },
+      "fused_prob": 0.5810379311442375
+    },
+    {
+      "patient_id": 1212,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.947734534740448,
+        "coronal": 0.6637747287750244,
+        "sagittal": 0.09732235223054886
+      },
+      "fused_prob": 0.569610538582007
+    },
+    {
+      "patient_id": 1230,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.011939028277993202,
+        "coronal": 0.7971542477607727,
+        "sagittal": 0.8622402548789978
+      },
+      "fused_prob": 0.5571111769725879
+    },
+    {
+      "patient_id": 1216,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.010386769659817219,
+        "coronal": 0.7144430875778198,
+        "sagittal": 0.8946039080619812
+      },
+      "fused_prob": 0.5398112550998727
+    },
+    {
+      "patient_id": 1192,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.0035608825273811817,
+        "coronal": 0.8530160188674927,
+        "sagittal": 0.7453020215034485
+      },
+      "fused_prob": 0.5339596409661075
+    },
+    {
+      "patient_id": 1231,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.885552704334259,
+        "coronal": 0.6275753974914551,
+        "sagittal": 0.07604645937681198
+      },
+      "fused_prob": 0.5297248537341753
+    },
+    {
+      "patient_id": 1211,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.23715342581272125,
+        "coronal": 0.6288550496101379,
+        "sagittal": 0.7205886840820312
+      },
+      "fused_prob": 0.5288657198349634
+    },
+    {
+      "patient_id": 1218,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.0558178648352623,
+        "coronal": 0.7105738520622253,
+        "sagittal": 0.8152912259101868
+      },
+      "fused_prob": 0.5272276476025581
+    },
+    {
+      "patient_id": 1228,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.8441826701164246,
+        "coronal": 0.6038483381271362,
+        "sagittal": 0.08979740738868713
+      },
+      "fused_prob": 0.512609471877416
+    },
+    {
+      "patient_id": 1163,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0005297540919855237,
+        "coronal": 0.6966145038604736,
+        "sagittal": 0.8124487400054932
+      },
+      "fused_prob": 0.5031976659859841
+    },
+    {
+      "patient_id": 1137,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.02042875438928604,
+        "coronal": 0.7494096159934998,
+        "sagittal": 0.7278644442558289
+      },
+      "fused_prob": 0.49923427154620487
+    },
+    {
+      "patient_id": 1138,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.00044813891872763634,
+        "coronal": 0.8446231484413147,
+        "sagittal": 0.63493412733078
+      },
+      "fused_prob": 0.49333513823027414
+    },
+    {
+      "patient_id": 1195,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.019893957301974297,
+        "coronal": 0.8676091432571411,
+        "sagittal": 0.45841020345687866
+      },
+      "fused_prob": 0.44863776800533134
+    },
+    {
+      "patient_id": 1161,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.033106472343206406,
+        "coronal": 0.5881988406181335,
+        "sagittal": 0.6138977408409119
+      },
+      "fused_prob": 0.41173435126741725
+    },
+    {
+      "patient_id": 1181,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.016056252643465996,
+        "coronal": 0.7727971076965332,
+        "sagittal": 0.4348214268684387
+      },
+      "fused_prob": 0.407891595736146
+    },
+    {
+      "patient_id": 1187,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.011432508938014507,
+        "coronal": 0.4852127730846405,
+        "sagittal": 0.7211801409721375
+      },
+      "fused_prob": 0.4059418076649308
+    },
+    {
+      "patient_id": 1178,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.3907405436038971,
+        "coronal": 0.6512289643287659,
+        "sagittal": 0.11401303112506866
+      },
+      "fused_prob": 0.3853275130192439
+    },
+    {
+      "patient_id": 1158,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.5355564951896667,
+        "coronal": 0.584060549736023,
+        "sagittal": 0.022669795900583267
+      },
+      "fused_prob": 0.3807622802754243
+    },
+    {
+      "patient_id": 1217,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.10543519258499146,
+        "coronal": 0.6326004266738892,
+        "sagittal": 0.2794739603996277
+      },
+      "fused_prob": 0.33916985988616943
+    },
+    {
+      "patient_id": 1194,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.003889653366059065,
+        "coronal": 0.8599867820739746,
+        "sagittal": 0.15131132304668427
+      },
+      "fused_prob": 0.33839591949557263
+    },
+    {
+      "patient_id": 1222,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.00010979957733070478,
+        "coronal": 0.8431332111358643,
+        "sagittal": 0.15002502501010895
+      },
+      "fused_prob": 0.3310893452411013
+    },
+    {
+      "patient_id": 1171,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.015135852620005608,
+        "coronal": 0.9159870147705078,
+        "sagittal": 0.022489625960588455
+      },
+      "fused_prob": 0.31787083111703396
+    },
+    {
+      "patient_id": 1147,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.31522107124328613,
+        "coronal": 0.5937985181808472,
+        "sagittal": 0.043213505297899246
+      },
+      "fused_prob": 0.31741103157401085
+    },
+    {
+      "patient_id": 1237,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.12778501212596893,
+        "coronal": 0.6962625980377197,
+        "sagittal": 0.10906559973955154
+      },
+      "fused_prob": 0.3110377366344134
+    },
+    {
+      "patient_id": 1232,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.06700928509235382,
+        "coronal": 0.6711534261703491,
+        "sagittal": 0.15109246969223022
+      },
+      "fused_prob": 0.2964183936516444
+    },
+    {
+      "patient_id": 1234,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.003682590089738369,
+        "coronal": 0.8239870071411133,
+        "sagittal": 0.05226714909076691
+      },
+      "fused_prob": 0.29331224877387285
+    },
+    {
+      "patient_id": 1156,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.00012777403753716499,
+        "coronal": 0.7913236618041992,
+        "sagittal": 0.0853719636797905
+      },
+      "fused_prob": 0.29227446650717565
+    },
+    {
+      "patient_id": 1173,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.0014043012633919716,
+        "coronal": 0.23413866758346558,
+        "sagittal": 0.6379689574241638
+      },
+      "fused_prob": 0.29117064209034044
+    },
+    {
+      "patient_id": 1235,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.011401417665183544,
+        "coronal": 0.8232054710388184,
+        "sagittal": 0.0009927138453349471
+      },
+      "fused_prob": 0.27853320084977895
+    },
+    {
+      "patient_id": 1240,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.01068930421024561,
+        "coronal": 0.7801209688186646,
+        "sagittal": 0.0014124942244961858
+      },
+      "fused_prob": 0.26407425575113547
+    },
+    {
+      "patient_id": 1160,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 3.920431117876433e-05,
+        "coronal": 0.7685959935188293,
+        "sagittal": 0.0008777341572567821
+      },
+      "fused_prob": 0.25650431066242163
+    },
+    {
+      "patient_id": 1242,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 1.0886930795095395e-05,
+        "coronal": 0.7185382843017578,
+        "sagittal": 0.0015801950357854366
+      },
+      "fused_prob": 0.24004312208944611
+    },
+    {
+      "patient_id": 1140,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.00046017931890673935,
+        "coronal": 0.6898433566093445,
+        "sagittal": 0.01737358793616295
+      },
+      "fused_prob": 0.2358923746214714
+    },
+    {
+      "patient_id": 1132,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 2.8694004868157208e-05,
+        "coronal": 0.6752904653549194,
+        "sagittal": 0.026984600350260735
+      },
+      "fused_prob": 0.23410125323668277
+    },
+    {
+      "patient_id": 1241,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 5.350696241634978e-08,
+        "coronal": 0.5452812314033508,
+        "sagittal": 0.1298052817583084
+      },
+      "fused_prob": 0.22502885555620722
+    },
+    {
+      "patient_id": 1233,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 2.8537756406876724e-06,
+        "coronal": 0.6230534315109253,
+        "sagittal": 0.03956218063831329
+      },
+      "fused_prob": 0.22087282197495975
+    },
+    {
+      "patient_id": 1144,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 8.637295832158998e-05,
+        "coronal": 0.6053079962730408,
+        "sagittal": 0.051393281668424606
+      },
+      "fused_prob": 0.21892921696659565
+    },
+    {
+      "patient_id": 1148,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 2.047484122158494e-05,
+        "coronal": 0.6279122829437256,
+        "sagittal": 0.016061481088399887
+      },
+      "fused_prob": 0.21466474629111568
+    },
+    {
+      "patient_id": 1153,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.005823842715471983,
+        "coronal": 0.4297296404838562,
+        "sagittal": 0.1942325234413147
+      },
+      "fused_prob": 0.2099286688802143
+    },
+    {
+      "patient_id": 1221,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.01583208702504635,
+        "coronal": 0.5928881764411926,
+        "sagittal": 0.0008797014015726745
+      },
+      "fused_prob": 0.20319998828927055
+    },
+    {
+      "patient_id": 1150,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 3.3018161502695875e-06,
+        "coronal": 0.5720300674438477,
+        "sagittal": 0.03492337837815285
+      },
+      "fused_prob": 0.20231891587938358
+    },
+    {
+      "patient_id": 1135,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0002970972564071417,
+        "coronal": 0.5309974551200867,
+        "sagittal": 0.06251908093690872
+      },
+      "fused_prob": 0.19793787777113417
+    },
+    {
+      "patient_id": 1243,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.057035982608795166,
+        "coronal": 0.5228564739227295,
+        "sagittal": 0.011554858647286892
+      },
+      "fused_prob": 0.19714910505960384
+    },
+    {
+      "patient_id": 1151,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 3.0926751151127974e-06,
+        "coronal": 0.5808855891227722,
+        "sagittal": 0.0052596647292375565
+      },
+      "fused_prob": 0.19538278217570829
+    },
+    {
+      "patient_id": 1145,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 5.9083513406221755e-06,
+        "coronal": 0.5819907784461975,
+        "sagittal": 8.325283124577254e-05
+      },
+      "fused_prob": 0.19402664654292798
+    },
+    {
+      "patient_id": 1244,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0005782829830422997,
+        "coronal": 0.5361566543579102,
+        "sagittal": 0.0012687183916568756
+      },
+      "fused_prob": 0.17933455191086978
+    },
+    {
+      "patient_id": 1142,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.2660478949546814,
+        "coronal": 0.26929402351379395,
+        "sagittal": 0.0019004559144377708
+      },
+      "fused_prob": 0.17908079146097103
+    },
+    {
+      "patient_id": 1180,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 9.189246156893205e-06,
+        "coronal": 0.5161516070365906,
+        "sagittal": 0.003958335146307945
+      },
+      "fused_prob": 0.17337304380968513
+    },
+    {
+      "patient_id": 1169,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.006565039046108723,
+        "coronal": 0.4257902503013611,
+        "sagittal": 0.08407595008611679
+      },
+      "fused_prob": 0.1721437464778622
+    },
+    {
+      "patient_id": 1155,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 9.959920134861022e-06,
+        "coronal": 0.44457709789276123,
+        "sagittal": 0.059167660772800446
+      },
+      "fused_prob": 0.16791823952856552
+    },
+    {
+      "patient_id": 1152,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 8.547210200049449e-06,
+        "coronal": 0.4443366229534149,
+        "sagittal": 0.04263032227754593
+      },
+      "fused_prob": 0.16232516414705364
+    },
+    {
+      "patient_id": 1154,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 9.112975618563723e-08,
+        "coronal": 0.46518266201019287,
+        "sagittal": 4.264982635504566e-05
+      },
+      "fused_prob": 0.15507513432210138
+    },
+    {
+      "patient_id": 1134,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.000565637310501188,
+        "coronal": 0.441975861787796,
+        "sagittal": 0.0010625967988744378
+      },
+      "fused_prob": 0.14786803196572387
+    },
+    {
+      "patient_id": 1159,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0008061597472988069,
+        "coronal": 0.32459938526153564,
+        "sagittal": 0.11327081173658371
+      },
+      "fused_prob": 0.14622545224847272
+    },
+    {
+      "patient_id": 1164,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0002824842813424766,
+        "coronal": 0.35519543290138245,
+        "sagittal": 0.03878169134259224
+      },
+      "fused_prob": 0.13141986950843906
+    },
+    {
+      "patient_id": 1183,
+      "true_label": 1,
+      "plane_probs": {
+        "axial": 0.0034033027477562428,
+        "coronal": 0.3289240896701813,
+        "sagittal": 0.057452842593193054
+      },
+      "fused_prob": 0.12992674500371018
+    },
+    {
+      "patient_id": 1168,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.00025840202579274774,
+        "coronal": 0.33272266387939453,
+        "sagittal": 0.02789336070418358
+      },
+      "fused_prob": 0.12029147553645696
+    },
+    {
+      "patient_id": 1139,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0012282857205718756,
+        "coronal": 0.355389803647995,
+        "sagittal": 0.0010175892384722829
+      },
+      "fused_prob": 0.11921189286901306
+    },
+    {
+      "patient_id": 1247,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0014895974891260266,
+        "coronal": 0.3367990553379059,
+        "sagittal": 0.015895310789346695
+      },
+      "fused_prob": 0.11806132120545954
+    },
+    {
+      "patient_id": 1170,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.004127648193389177,
+        "coronal": 0.22836293280124664,
+        "sagittal": 0.11374267935752869
+      },
+      "fused_prob": 0.11541108678405483
+    },
+    {
+      "patient_id": 1236,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0022994144819676876,
+        "coronal": 0.31989672780036926,
+        "sagittal": 0.02218184806406498
+      },
+      "fused_prob": 0.11479266344880064
+    },
+    {
+      "patient_id": 1131,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 9.761026740306988e-05,
+        "coronal": 0.334447979927063,
+        "sagittal": 0.0034745782613754272
+      },
+      "fused_prob": 0.1126733894852805
+    },
+    {
+      "patient_id": 1146,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 9.706438868306577e-05,
+        "coronal": 0.29935503005981445,
+        "sagittal": 0.03572898358106613
+      },
+      "fused_prob": 0.11172702600985455
+    },
+    {
+      "patient_id": 1165,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 5.537939432542771e-05,
+        "coronal": 0.27995091676712036,
+        "sagittal": 0.04482453316450119
+      },
+      "fused_prob": 0.108276943108649
+    },
+    {
+      "patient_id": 1249,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 4.4389686081558466e-05,
+        "coronal": 0.3177684545516968,
+        "sagittal": 0.0056442925706505775
+      },
+      "fused_prob": 0.10781904560280964
+    },
+    {
+      "patient_id": 1143,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 7.084485673658492e-07,
+        "coronal": 0.3152817189693451,
+        "sagittal": 0.0015113508561626077
+      },
+      "fused_prob": 0.10559792609135836
+    },
+    {
+      "patient_id": 1166,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0004564544651657343,
+        "coronal": 0.2986757457256317,
+        "sagittal": 0.006404940504580736
+      },
+      "fused_prob": 0.10184571356512606
+    },
+    {
+      "patient_id": 1238,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 5.832290480611846e-05,
+        "coronal": 0.2575302720069885,
+        "sagittal": 0.02818487212061882
+      },
+      "fused_prob": 0.09525782234413782
+    },
+    {
+      "patient_id": 1226,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 9.93355643004179e-05,
+        "coronal": 0.2588617205619812,
+        "sagittal": 0.011587806046009064
+      },
+      "fused_prob": 0.09018295405743022
+    },
+    {
+      "patient_id": 1239,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 2.1928572095930576e-06,
+        "coronal": 0.2512829601764679,
+        "sagittal": 0.009326929226517677
+      },
+      "fused_prob": 0.08687069408673172
+    },
+    {
+      "patient_id": 1130,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 6.833385850768536e-05,
+        "coronal": 0.24657988548278809,
+        "sagittal": 0.005367459263652563
+      },
+      "fused_prob": 0.08400522620164945
+    },
+    {
+      "patient_id": 1157,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 3.8030810856071184e-07,
+        "coronal": 0.21269454061985016,
+        "sagittal": 0.02992360107600689
+      },
+      "fused_prob": 0.08087284066798854
+    },
+    {
+      "patient_id": 1141,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 4.930730938212946e-06,
+        "coronal": 0.231356680393219,
+        "sagittal": 0.005605816375464201
+      },
+      "fused_prob": 0.07898914249987381
+    },
+    {
+      "patient_id": 1149,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 3.8345133361872286e-06,
+        "coronal": 0.2305053472518921,
+        "sagittal": 6.165647937450558e-05
+      },
+      "fused_prob": 0.07685694608153426
+    },
+    {
+      "patient_id": 1167,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.001992250792682171,
+        "coronal": 0.21944557130336761,
+        "sagittal": 0.008779793046414852
+      },
+      "fused_prob": 0.07673920504748821
+    },
+    {
+      "patient_id": 1133,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 1.611385050637182e-05,
+        "coronal": 0.16063639521598816,
+        "sagittal": 0.002052976517006755
+      },
+      "fused_prob": 0.05423516186116709
+    },
+    {
+      "patient_id": 1136,
+      "true_label": 0,
+      "plane_probs": {
+        "axial": 0.0016159065999090672,
+        "coronal": 0.1316191405057907,
+        "sagittal": 0.0073236627504229546
+      },
+      "fused_prob": 0.046852903285374246
+    }
+  ]
+}
